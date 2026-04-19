@@ -2,3 +2,9 @@
 node_modules/
 
 dist/
+
+database.dump
+.env
+.env.production
+.env.development
+.env.example
