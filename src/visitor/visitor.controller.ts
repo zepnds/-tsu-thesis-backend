@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Patch, Body, Query, Param, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Query, Param, Req, UseGuards } from '@nestjs/common';
 import { VisitorService } from './visitor.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('api/visitor')
 export class VisitorController {
@@ -21,47 +22,56 @@ export class VisitorController {
   /* =========================================================================
      PROTECTED ROUTES
   ======================================================================== */
+  @UseGuards(JwtAuthGuard)
   @Post('reserve-plot')
   async reservePlot(@Body() body: any, @Req() req: any) {
-    const userId = req.user?.id || body.user_id || '15';
+    const userId = req.user.id;
     return this.visitorService.reservePlot(userId, body.plot_id, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('my-reservations')
-  async getMyReservations(@Query('userId') userId: string) {
+  async getMyReservations(@Req() req: any) {
+    const userId = req.user.id;
     return this.visitorService.getMyReservations(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('plot-request/list/:userId')
   async getPlotRequests(@Param('userId') userId: string) {
     return this.visitorService.getMyReservations(userId);
   }
 
   /* --- Burial Request --- */
+  @UseGuards(JwtAuthGuard)
   @Post('request-burial')
   async createBurialRequest(@Body() body: any, @Req() req: any) {
-    const userId = req.user?.id || body.user_id || '15';
+    const userId = req.user.id;
     return this.visitorService.createBurialRequest(userId, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('burial-request')
   async createBurialRequestAlias(@Body() body: any, @Req() req: any) {
-    const userId = req.user?.id || body.user_id || '15';
+    const userId = req.user.id;
     return this.visitorService.createBurialRequest(userId, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('my-burial-requests/:userId')
   async getMyBurialRequests(@Param('userId') userId: string) {
     return this.visitorService.getMyBurialRequests(userId);
   }
 
   /* --- Maintenance Request --- */
+  @UseGuards(JwtAuthGuard)
   @Post('request-maintenance')
   async createMaintenanceRequest(@Body() body: any, @Req() req: any) {
-    const userId = req.user?.id || body.user_id || '15';
+    const userId = req.user.id;
     return this.visitorService.createMaintenanceRequest(userId, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('my-maintenance-schedule/:userId')
   async getMyMaintenanceRequests(@Param('userId') userId: string) {
     return this.visitorService.getMyMaintenanceRequests(userId);
