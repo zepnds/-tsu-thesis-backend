@@ -15,11 +15,8 @@ if (!dbUrl) {
 // Path to the dump file
 const dumpPath = path.resolve(__dirname, '../database.dump');
 
-// pg_restore command
-// --clean: clean (drop) database objects before recreating
-// --no-acl: skip restoration of access privileges (grant/revoke)
-// --no-owner: skip restoration of object ownership
-const command = `pg_restore -d "${dbUrl}" --clean --no-acl --no-owner "${dumpPath}"`;
+// Use docker to run pg_restore so it doesn't require local Postgres installation
+const command = `docker run --rm -v "${dumpPath}:/tmp/database.dump" postgres pg_restore -d "${dbUrl}" --clean --no-acl --no-owner /tmp/database.dump`;
 
 console.log(`Starting database restore from: ${dumpPath}`);
 console.log(`Target Database URL: ${dbUrl.replace(/:[^:@]+@/, ':***@')}`); // Mask password
@@ -30,7 +27,7 @@ exec(command, (error, stdout, stderr) => {
     if (stderr) console.error(`pg_restore stderr: ${stderr}`);
     process.exit(1);
   }
-  
+
   if (stderr) {
     // pg_restore sometimes writes non-fatal warnings to stderr
     console.warn(`pg_restore warnings: ${stderr}`);
