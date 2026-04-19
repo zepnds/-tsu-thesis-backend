@@ -1,17 +1,22 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from '../entities/User.entity';
+import { MailingService } from '../library/mailing/mailing.service';
 
 @Injectable()
 export class AuthService {
+  // Temporary in-memory OTP store. Map key is the email address.
+  private otpStore = new Map<string, { code: string, expires: number }>();
+
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private mailingService: MailingService,
   ) { }
 
   async login(identifier: string, pass: string) {
@@ -38,26 +43,75 @@ export class AuthService {
     };
   }
 
-  async register(userData: any) {
-    const existingEmail = await this.userRepository.findOne({ where: { email: userData.email } });
+  async sendRegistrationOtp(email: string, username: string) {
+    // Check if user already exists before sending OTP
+    const existingEmail = await this.userRepository.findOne({ where: { email } });
     if (existingEmail) throw new ConflictException('Email already registered');
 
-    const existingUser = await this.userRepository.findOne({ where: { username: userData.username } });
+    const existingUser = await this.userRepository.findOne({ where: { username } });
+    if (existingUser) throw new ConflictException('Username already taken');
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store OTP with expiration (e.g., 10 minutes = 600000 ms)
+    const expires = Date.now() + 600000;
+    this.otpStore.set(email, { code: otp, expires });
+
+    // Send email
+    await this.mailingService.sendOtp(email, otp, 'Account Registration');
+
+    return { success: true, message: 'OTP sent successfully to ' + email };
+  }
+
+  async register(userData: any) {
+    const { otp, email, username, password, role, ...rest } = userData;
+
+    // Verify OTP
+    if (!otp) {
+      throw new BadRequestException('OTP is required for registration');
+    }
+
+    const storedOtp = this.otpStore.get(email);
+    if (!storedOtp) {
+      throw new BadRequestException('OTP not requested or expired');
+    }
+
+    if (storedOtp.code !== otp) {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+
+    if (Date.now() > storedOtp.expires) {
+      this.otpStore.delete(email);
+      throw new UnauthorizedException('OTP has expired');
+    }
+
+    // OTP is valid, proceed with registration
+    const existingEmail = await this.userRepository.findOne({ where: { email } });
+    if (existingEmail) throw new ConflictException('Email already registered');
+
+    const existingUser = await this.userRepository.findOne({ where: { username } });
     if (existingUser) throw new ConflictException('Username already taken');
 
     const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(userData.password, salt);
+    const password_hash = await bcrypt.hash(password, salt);
 
     const uid = crypto.randomBytes(2).toString('hex').toUpperCase();
 
     const newUser = this.userRepository.create({
-      ...userData,
+      ...rest,
+      email,
+      username,
       uid,
       password_hash,
-      role: userData.role || 'visitor',
+      role: role || 'visitor',
     });
 
     const savedUser = await this.userRepository.save(newUser);
+
+    // Remove OTP from store after successful registration
+    this.otpStore.delete(email);
+
     const { password_hash: _, ...result } = savedUser as any;
     return result;
   }

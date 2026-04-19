@@ -85,7 +85,7 @@ export class AdminService {
   }
 
   async getAllGrave() {
-    return this.graveRepository.find();
+    return this.graveRepository.find({ where: { is_delete: false } });
   }
 
   async addPlot(plotData: any) {
@@ -93,24 +93,45 @@ export class AdminService {
     return this.plotRepository.save(plot);
   }
 
+  async getPlotDetails(id: string) {
+    const plot = await this.plotRepository.findOne({ where: { id } });
+    if (!plot) {
+      throw new NotFoundException('Plot not found');
+    }
+    const grave = await this.graveRepository.findOne({ where: { plot_id: id, is_delete: false } });
+    return { plot, grave };
+  }
+
   async editPlot(id: string, plotData: any) {
-    const allowedFields = [
+    const allowedPlotFields = [
       'uid', 'plot_code', 'section_id', 'section_name', 'row_num', 'col_num',
       'plot_type', 'size_sqm', 'status', 'coordinates', 'plot_boundary',
       'price', 'plot_name', 'kind', 'geom', 'next_of_kin_name', 'notes'
     ];
 
-    const sanitizedData: any = {};
-    for (const key of allowedFields) {
+    const sanitizedPlotData: any = {};
+    for (const key of allowedPlotFields) {
       if (plotData[key] !== undefined) {
-        sanitizedData[key] = plotData[key];
+        sanitizedPlotData[key] = plotData[key];
       }
     }
 
-    if (Object.keys(sanitizedData).length > 0) {
-      await this.plotRepository.update(id, sanitizedData);
+    if (Object.keys(sanitizedPlotData).length > 0) {
+      await this.plotRepository.update(id, sanitizedPlotData);
     }
-    return this.plotRepository.findOne({ where: { id } });
+
+    // Also update grave if fields like person_full_name are provided
+    const graveFieldsToUpdate: any = {};
+    if (plotData.person_full_name !== undefined) graveFieldsToUpdate.deceased_name = plotData.person_full_name;
+    if (plotData.date_of_birth !== undefined) graveFieldsToUpdate.birth_date = plotData.date_of_birth;
+    if (plotData.date_of_death !== undefined) graveFieldsToUpdate.death_date = plotData.date_of_death;
+    if (plotData.qr_token !== undefined) graveFieldsToUpdate.qr_token = plotData.qr_token;
+
+    if (Object.keys(graveFieldsToUpdate).length > 0) {
+      await this.graveRepository.update({ plot_id: id }, graveFieldsToUpdate);
+    }
+
+    return this.getPlotDetails(id);
   }
 
   async deletePlot(id: string) {

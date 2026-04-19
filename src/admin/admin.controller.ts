@@ -38,7 +38,7 @@ export class AdminController {
 
   @Get('plot/:id')
   async getPlotDetails(@Param('id') id: string) {
-    return this.adminService.editPlot(id, {}); // Placeholder for detail retrieval
+    return this.adminService.getPlotDetails(id);
   }
 
   /* --- Burial Records --- */

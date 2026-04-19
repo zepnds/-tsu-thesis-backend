@@ -42,6 +42,9 @@ export class Grave {
   @Column({ type: 'boolean', default: true, nullable: false })
   is_active: boolean;
 
+  @Column({ type: 'boolean', default: false, nullable: false })
+  is_delete: boolean;
+
   @Column({ type: 'text', nullable: true })
   photo_url: string;
 

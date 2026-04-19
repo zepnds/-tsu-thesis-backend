@@ -23,7 +23,7 @@ export class VisitorService {
     private maintenanceRequestRepository: Repository<MaintenanceRequest>,
   ) {}
 
-  async getBurialRecords(options: { search?: string } = {}) {
+  async getBurialRecords(options: { search?: string; limit?: number; offset?: number } = {}) {
     const findOptions: any = {
       relations: ['plot'],
       order: { deceased_name: 'ASC' },
@@ -33,6 +33,14 @@ export class VisitorService {
       findOptions.where = {
         deceased_name: ILike(`%${options.search}%`),
       };
+    }
+
+    if (options.limit !== undefined && !isNaN(options.limit)) {
+      findOptions.take = options.limit;
+    }
+    
+    if (options.offset !== undefined && !isNaN(options.offset)) {
+      findOptions.skip = options.offset;
     }
 
     return this.graveRepository.find(findOptions);

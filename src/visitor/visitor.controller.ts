@@ -10,8 +10,21 @@ export class VisitorController {
      PUBLIC ROUTES
   ======================================================================== */
   @Get('burial-records')
-  async getBurialRecords(@Query('search') search: string) {
-    return this.visitorService.getBurialRecords({ search });
+  async getBurialRecords(
+    @Query('search') search?: string,
+    @Query('q') q?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    const searchTerm = q || search;
+    const limitNum = limit ? parseInt(limit, 10) : undefined;
+    const offsetNum = offset ? parseInt(offset, 10) : undefined;
+
+    return this.visitorService.getBurialRecords({
+      search: searchTerm,
+      limit: limitNum,
+      offset: offsetNum,
+    });
   }
 
   @Get('dashboard-stats')

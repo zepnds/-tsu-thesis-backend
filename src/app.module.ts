@@ -3,9 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { User } from './entities/User.entity';
-import { Plot } from './entities/Plot.entity';
-import { PlotReservation } from './entities/PlotReservation.entity';
 import { VisitorModule } from './visitor/visitor.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
@@ -18,6 +15,7 @@ import { ReservationsModule } from './reservations/reservations.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { BurialRequestsModule } from './burial-requests/burial-requests.module';
 import { UsersModule } from './users/users.module';
+import { MailingModule } from './library/mailing/mailing.module';
 
 @Module({
   imports: [
@@ -26,16 +24,20 @@ import { UsersModule } from './users/users.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.get<string>('DATABASE_URL'),
-        autoLoadEntities: true,
-        synchronize: false, // We use existing DB, don't sync in prod
-        logging: true,
-        ssl: {
-          rejectUnauthorized: false, // Required for Render.com hosted PostgreSQL
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const dbUrl = configService.get<string>('DATABASE_URL');
+        console.log('--- DB URL IS:', dbUrl, '---');
+        return {
+          type: 'postgres',
+          url: dbUrl,
+          autoLoadEntities: true,
+          synchronize: false, // We use existing DB, don't sync in prod
+          logging: true,
+          ssl: {
+            rejectUnauthorized: false, // Required for Render.com hosted PostgreSQL
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     VisitorModule,
@@ -50,8 +52,9 @@ import { UsersModule } from './users/users.module';
     MaintenanceModule,
     BurialRequestsModule,
     UsersModule,
+    MailingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

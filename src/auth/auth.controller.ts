@@ -10,6 +10,11 @@ export class AuthController {
     return this.authService.login(body.usernameOrEmail, body.password);
   }
 
+  @Post('send-registration-otp')
+  async sendRegistrationOtp(@Body() body: any) {
+    return this.authService.sendRegistrationOtp(body.email, body.username);
+  }
+
   @Post('register')
   async register(@Body() body: any) {
     return this.authService.register(body);
