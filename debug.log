@@ -1,0 +1,279 @@
+
+> sementeryo-backend-nest@0.0.1 start:debug
+> nest start --debug --watch
+
+[2J[3J[H[[90m4:11:29 PM[0m] Starting compilation in watch mode...
+
+[[90m4:11:33 PM[0m] Found 0 errors. Watching for file changes.
+
+Starting inspector on 127.0.0.1:9229 failed: address already in use
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +12ms[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUsersModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +38ms[39m
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:34 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (1)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:37 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (2)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:40 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (3)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:43 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (4)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:46 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (5)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:49 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (6)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:52 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (7)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:55 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (8)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+query: SELECT version()
+query: SELECT * FROM current_schema()
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:58 PM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (9)...[39m
+TypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34)
+    at <anonymous> (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18)
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25)
+    at ConnectionMetadataBuilder.buildEntityMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\connection\src\connection\ConnectionMetadataBuilder.ts:106:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async DataSource.buildMetadatas (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:733:13)
+    at async DataSource.initialize (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\typeorm\data-source\src\data-source\DataSource.ts:264:13)
+[31m[Nest] 15744  - [39m04/18/2026, 4:11:58 PM [31m  ERROR[39m [38;5;3m[ExceptionHandler] [39mTypeORMError: Entity metadata for MaintenanceRequest#infrastructure was not found. Check if you specified a correct entity object and if it's connected in the connection options.
+    at <anonymous> [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1128:23[90m)[39m
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.computeInverseProperties [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:1118:34[90m)[39m
+    at <anonymous> [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:160:18[90m)[39m
+    at Array.forEach (<anonymous>)
+    at EntityMetadataBuilder.build [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\metadata-builder\src\metadata-builder\EntityMetadataBuilder.ts:159:25[90m)[39m
+    at ConnectionMetadataBuilder.buildEntityMetadatas [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\connection\src\connection\ConnectionMetadataBuilder.ts:106:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+    at async DataSource.buildMetadatas [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\data-source\src\data-source\DataSource.ts:733:13[90m)[39m
+    at async DataSource.initialize [90m(C:\Users\sojda\Desktop\TSU-Thesis\backend\[39mnode_modules\[4mtypeorm[24m\data-source\src\data-source\DataSource.ts:264:13[90m)[39m
+[2J[3J[H[[90m4:12:21 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m4:12:21 PM[0m] Found 0 errors. Watching for file changes.
+
+Starting inspector on 127.0.0.1:9229 failed: address already in use
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +21ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUsersModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +55ms[39m
+query: SELECT version()
+query: SELECT * FROM current_schema()
+query: CREATE EXTENSION IF NOT EXISTS "postgis"
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmCoreModule dependencies initialized[39m[38;5;3m +57ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mVisitorModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAdminModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mStaffModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPlotModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mGravesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mInfrastructureModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReservationsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMaintenanceModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBurialRequestsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCemeteryInfoModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/}:[39m[38;5;3m +5ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/, GET} route[39m[38;5;3m +3ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mVisitorController {/api/visitor}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/burial-records, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/dashboard-stats, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/reserve-plot, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/my-reservations, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/request-burial, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/my-burial-requests/:userId, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/request-maintenance, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/visitor/my-maintenance-requests/:family_contact, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/api/auth}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/register, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/profile, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/api/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/metrics, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/add-plot, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/edit-plot, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/delete-plot/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/plot/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/burial-records, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/burial-records, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/visitor-users, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mStaffController {/api/staff}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/staff/tickets, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/staff/update-ticket-status/:type/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/staff/burial-schedules, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/staff/maintenance-schedules, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPlotController {/api/plot}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/plot, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/plot/road-plots, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/plot/building-plots, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/plot/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mCemeteryInfoController {/api/cemetery-info}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/cemetery-info, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/cemetery-info/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mSuperAdminController {/api/superadmin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/superadmin/save-cemetery-info, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mGravesController {/api/graves}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/graves, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/graves/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/graves, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/graves/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/graves/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mInfrastructureController {/api/infrastructure}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/infrastructure/roads, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/infrastructure/buildings, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReservationsController {/api/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/reservations, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/reservations/:id/reject, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/reservations/:id/approve, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/reservations/:id/approve-payment, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mMaintenanceController {/api/admin/maintenance}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/maintenance/requests, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/maintenance/:id/schedule, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/maintenance/:id/complete, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mBurialRequestsController {/api/burial-requests}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/burial-requests/:family_contact, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mUsersController {/users}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +4ms[39m
+[31m[Nest] 4908  - [39m04/18/2026, 4:12:23 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::9000[39m[38;5;3m +3ms[39m
+node:net:1948
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::9000
+    at Server.setupListenHandle [as _listen2] (node:net:1948:16)
+    at listenInCluster (node:net:2005:12)
+    at Server.listen (node:net:2110:7)
+    at ExpressAdapter.listen (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\@nestjs\core\nest-application.js:188:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\sojda\Desktop\TSU-Thesis\backend\node_modules\@nestjs\core\nest-application.js:178:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async bootstrap (C:\Users\sojda\Desktop\TSU-Thesis\backend\src\main.ts:15:3) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 9000
+}
+
+Node.js v24.14.1
+[2J[3J[H[[90m4:14:45 PM[0m] File change detected. Starting incremental compilation...
+

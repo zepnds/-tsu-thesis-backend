@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_URL: postgresql://postgres:vr123456@db:5432/cemetery_db
+      JWT_SECRET: CHANGE_THIS_TO_A_LONG_RANDOM_SECRET
+      JWT_EXPIRES_IN: 7d
+      CORS_ORIGINS: "http://localhost,http://localhost:80,http://localhost:5173"
+    ports:
+      - "5000:8080"
+    volumes:
+      - ./backend/uploads:/app/uploads
