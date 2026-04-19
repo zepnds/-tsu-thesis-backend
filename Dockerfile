@@ -1,35 +1,16 @@
-# backend/Dockerfile
-
-# ── Stage 1: build ──────────────────────────────────────────
-FROM node:20-alpine AS builder
-
+# Stage 1: Build
+FROM node:20-slim AS builder
 WORKDIR /app
-
 COPY package*.json ./
-# Install ALL deps (including devDeps like typescript, @nestjs/cli)
-RUN npm ci
-
+RUN npm install
 COPY . .
-
-# Compile TypeScript → dist/
 RUN npm run build
 
-# ── Stage 2: production image ────────────────────────────────
-FROM node:20-alpine AS runner
-
+# Stage 2: Run
+FROM node:20-slim
 WORKDIR /app
-
-COPY package*.json ./
-# Only production deps
-RUN npm ci --omit=dev
-
-# Copy compiled output from builder
 COPY --from=builder /app/dist ./dist
-
-# Copy uploads folder (if it exists)
-COPY --from=builder /app/uploads ./uploads
-
-ENV NODE_ENV=production
-EXPOSE 8080
-
-CMD ["node", "dist/main.js"]
+COPY --from=builder /app/package*.json ./
+RUN npm install --only=production
+EXPOSE 3000
+CMD ["node", "dist/main"]
