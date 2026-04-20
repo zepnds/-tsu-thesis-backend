@@ -135,7 +135,15 @@ export class AdminService {
   }
 
   async deletePlot(id: string) {
-    return this.plotRepository.delete(id);
+    const plot = await this.plotRepository.findOne({ where: { id } });
+    if (!plot) {
+      throw new NotFoundException('Plot not found');
+    }
+    const grave = await this.graveRepository.findOne({ where: { plot_id: id, is_delete: false } });
+    if (grave) {
+      await this.graveRepository.update(grave.id, { is_delete: true });
+    }
+    return await this.plotRepository.update(id, { status: 'available', updated_at: new Date() });
   }
 
   async addBurialRecord(graveData: any) {
@@ -179,6 +187,13 @@ export class AdminService {
 
   async getMaintenanceRequests() {
     return this.maintenanceRequestRepository.find({
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  async getReservations() {
+    return this.plotReservationRepository.find({
+      relations: ['plot', 'user'],
       order: { created_at: 'DESC' },
     });
   }

@@ -74,6 +74,11 @@ export class AdminController {
     return this.adminService.getVisitors();
   }
 
+  @Get('reservations')
+  async getReservations() {
+    return this.adminService.getReservations();
+  }
+
   /* --- Reservations --- */
   @Patch('reservations/:id/approve-payment')
   async approveReservationPayment(@Param('id') id: string) {

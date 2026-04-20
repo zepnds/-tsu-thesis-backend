@@ -21,7 +21,8 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "npm run typeorm migration:generate -- -d src/data-source.ts",
     "migration:run": "npm run typeorm migration:run -- -d src/data-source.ts",
-    "migration:revert": "npm run typeorm migration:revert -- -d src/data-source.ts"
+    "migration:revert": "npm run typeorm migration:revert -- -d src/data-source.ts",
+    "db:seed": "docker cp database.dump postgres_db:/tmp/database.dump && docker exec postgres_db pg_restore -U postgres -d cemetery_db --clean --if-exists --no-owner --no-privileges /tmp/database.dump"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

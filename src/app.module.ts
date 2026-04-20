@@ -25,7 +25,7 @@ import { MailingModule } from './library/mailing/mailing.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const dbUrl = configService.get<string>('DATABASE_URL');
+        const dbUrl = configService.get<string>('DATABASE_URL') || '';
         console.log('--- DB URL IS:', dbUrl, '---');
         return {
           type: 'postgres',
@@ -33,9 +33,7 @@ import { MailingModule } from './library/mailing/mailing.module';
           autoLoadEntities: true,
           synchronize: false, // We use existing DB, don't sync in prod
           logging: true,
-          ssl: {
-            rejectUnauthorized: false, // Required for Render.com hosted PostgreSQL
-          },
+          ssl: false,
         };
       },
       inject: [ConfigService],
