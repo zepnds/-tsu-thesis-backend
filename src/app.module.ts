@@ -33,7 +33,12 @@ import { MailingModule } from './library/mailing/mailing.module';
           autoLoadEntities: true,
           synchronize: false, // We use existing DB, don't sync in prod
           logging: true,
-          ssl: false,
+          ssl: true,
+          extra: {
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          },
         };
       },
       inject: [ConfigService],
