@@ -27,19 +27,19 @@ export class MaintenanceRequest {
   @Column({ type: 'bigint', nullable: true })
   assigned_staff_id: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: false })
   request_type: string;
 
   @Column({ type: 'text', nullable: true })
   category: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: false })
   description: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: false, default: 'medium' })
   priority: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: false, default: 'pending' })
   status: string;
 
   @Column({ type: 'numeric', nullable: true })

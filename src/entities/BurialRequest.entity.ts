@@ -41,6 +41,9 @@ export class BurialRequest {
   @Column({ type: 'text', nullable: true })
   confirmed_by: string;
 
+  @Column({ type: 'bigint', nullable: true })
+  requester_id: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

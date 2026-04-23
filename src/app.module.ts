@@ -27,17 +27,15 @@ import { MailingModule } from './library/mailing/mailing.module';
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('DATABASE_URL') || '';
         console.log('--- DB URL IS:', dbUrl, '---');
+        const isLocal = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1');
         return {
           type: 'postgres',
           url: dbUrl,
           autoLoadEntities: true,
           synchronize: false, // We use existing DB, don't sync in prod
           logging: true,
-          ssl: true,
-          extra: {
-            ssl: {
-              rejectUnauthorized: false,
-            },
+          ssl: isLocal ? false : {
+            rejectUnauthorized: false,
           },
         };
       },

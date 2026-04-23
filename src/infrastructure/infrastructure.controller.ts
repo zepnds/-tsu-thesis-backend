@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { InfrastructureService } from './infrastructure.service';
 
-@Controller('api/infrastructure')
+@Controller('infrastructure')
 export class InfrastructureController {
   constructor(private readonly service: InfrastructureService) {}
 

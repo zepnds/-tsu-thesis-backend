@@ -21,7 +21,7 @@ export class VisitorService {
     private burialRequestRepository: Repository<BurialRequest>,
     @InjectRepository(MaintenanceRequest)
     private maintenanceRequestRepository: Repository<MaintenanceRequest>,
-  ) {}
+  ) { }
 
   async getBurialRecords(options: { search?: string; limit?: number; offset?: number } = {}) {
     const findOptions: any = {
@@ -38,7 +38,7 @@ export class VisitorService {
     if (options.limit !== undefined && !isNaN(options.limit)) {
       findOptions.take = options.limit;
     }
-    
+
     if (options.offset !== undefined && !isNaN(options.offset)) {
       findOptions.skip = options.offset;
     }
@@ -100,14 +100,43 @@ export class VisitorService {
     });
   }
 
+  async getMyDeceasedFamily(userId: string) {
+    return this.graveRepository.find({
+      where: { user_id: userId },
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  async getMyDeceasedFamilyPlot(userId: string, plotId: string) {
+    return this.graveRepository.find({
+      where: { user_id: userId, plot_id: plotId },
+      order: { created_at: 'DESC' },
+    });
+  }
+
   async createMaintenanceRequest(userId: string, requestData: any) {
     const uid = crypto.randomBytes(2).toString('hex').toUpperCase();
+
+    // Fallback: extract plot_id from description if missing in payload
+    if (!requestData.plot_id && requestData.description) {
+      const match = requestData.description.match(/Linked plot ID: (\d+)/i);
+      if (match && match[1]) {
+        requestData.plot_id = match[1];
+      }
+    }
+
+    // Ensure empty strings are treated as null for IDs
+    if (requestData.plot_id === '') requestData.plot_id = null;
+    if (requestData.grave_id === '') requestData.grave_id = null;
+
     const newRequest = this.maintenanceRequestRepository.create({
       ...requestData,
       uid,
       requester_id: userId,
+      request_type: requestData.request_type || 'Maintenance',
       status: 'pending',
     });
+
     return this.maintenanceRequestRepository.save(newRequest);
   }
 

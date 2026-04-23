@@ -1,7 +1,7 @@
 import { Controller, Get, Patch, Body, Param } from '@nestjs/common';
 import { CemeteryInfoService } from './cemetery-info.service';
 
-@Controller('api/cemetery-info')
+@Controller('cemetery-info')
 export class CemeteryInfoController {
   constructor(private readonly infoService: CemeteryInfoService) { }
 

@@ -2,9 +2,9 @@ import { Controller, Get, Post, Patch, Body, Query, Param, Req, UseGuards } from
 import { VisitorService } from './visitor.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@Controller('api/visitor')
+@Controller('visitor')
 export class VisitorController {
-  constructor(private readonly visitorService: VisitorService) {}
+  constructor(private readonly visitorService: VisitorService) { }
 
   /* =========================================================================
      PUBLIC ROUTES
@@ -74,6 +74,19 @@ export class VisitorController {
   @Get('my-burial-requests/:userId')
   async getMyBurialRequests(@Param('userId') userId: string) {
     return this.visitorService.getMyBurialRequests(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-deceased-family/:userId')
+  async getMyDeceasedFamily(@Param('userId') userId: string) {
+    return this.visitorService.getMyDeceasedFamily(userId);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-deceased-family-grave')
+  async getMyDeceasedFamilyPlot(@Query('userId') userId: string, @Query('plotId') plotId: string) {
+    return this.visitorService.getMyDeceasedFamilyPlot(userId, plotId);
   }
 
   /* --- Maintenance Request --- */

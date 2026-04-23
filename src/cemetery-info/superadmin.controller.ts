@@ -11,7 +11,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
 
-@Controller('api/superadmin')
+@Controller('superadmin')
 export class SuperAdminController {
   constructor(private readonly infoService: CemeteryInfoService) {}
 

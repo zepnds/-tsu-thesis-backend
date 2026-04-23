@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Patch } from '@nestjs/common';
 import { AdminService } from './admin.service';
 
-@Controller('api/admin')
+@Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) { }
 
@@ -9,6 +9,7 @@ export class AdminController {
   async getMetrics() {
     return this.adminService.getDashboardMetrics();
   }
+
 
   @Get('plots')
   async getPlots() {
@@ -18,6 +19,12 @@ export class AdminController {
   @Get('graves')
   async getAllGrave() {
     return this.adminService.getAllGrave();
+  }
+
+
+  @Get('burial-schedule')
+  async getBurialSchedule() {
+    return this.adminService.getBurialSchedule();
   }
 
   /* --- Plots --- */
@@ -72,6 +79,11 @@ export class AdminController {
   @Get('visitors')
   async getVisitors() {
     return this.adminService.getVisitors();
+  }
+  
+  @Put('visitors/:id')
+  async updateVisitor(@Param('id') id: string, @Body() body: any) {
+    return this.adminService.updateVisitor(id, body);
   }
 
   @Get('reservations')

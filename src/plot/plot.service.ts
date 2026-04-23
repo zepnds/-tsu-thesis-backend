@@ -14,7 +14,7 @@ export class PlotService {
     private buildingPlotRepository: Repository<BuildingPlot>,
     @InjectRepository(RoadPlot)
     private roadPlotRepository: Repository<RoadPlot>,
-  ) {}
+  ) { }
 
   async getPlotDetails(idOrUid: string) {
     let plot = await this.plotRepository.findOne({ where: { id: idOrUid } });
@@ -39,27 +39,48 @@ export class PlotService {
   }
 
   async getPlotsGeoJson() {
-    const rawData = await this.plotRepository.query(`
-      SELECT id, uid, plot_name, status, price, section_id, ST_AsGeoJSON(coordinates) as geojson 
-      FROM plots
-    `);
+    console.log('PlotService: Fetching plots GeoJSON...');
+    try {
+      const rawData = await this.plotRepository.query(`
+        SELECT id, uid, size_sqm,plot_type, plot_code, price, section_id, plot_name, status, ST_AsGeoJSON(coordinates) as geojson 
+        FROM plots
+      `);
+      console.log(`PlotService: Found ${rawData?.length} plots`);
 
-    return {
-      type: 'FeatureCollection',
-      features: rawData.map((row) => ({
-        type: 'Feature',
-        id: row.id,
-        geometry: typeof row.geojson === 'string' ? JSON.parse(row.geojson) : row.geojson,
-        properties: {
+      const features = rawData.map((row) => {
+        let geometry = null;
+        try {
+          geometry = typeof row.geojson === 'string' ? JSON.parse(row.geojson) : row.geojson;
+        } catch (e) {
+          console.error(`Error parsing geojson for plot ${row.id}:`, e);
+        }
+
+        return {
+          type: 'Feature',
           id: row.id,
-          uid: row.uid,
-          plot_name: row.plot_name,
-          status: row.status,
-          price: row.price,
-          section_id: row.section_id,
-        },
-      })),
-    };
+          geometry: geometry,
+          properties: {
+            id: row.id,
+            uid: row.uid,
+            plot_name: row.plot_name,
+            status: row.status,
+            price: row.price,
+            section_id: row.section_id,
+            size_sqm: row.size_sqm,
+            plot_code: row.plot_code,
+            plot_type: row.plot_type
+          },
+        };
+      });
+
+      return {
+        type: 'FeatureCollection',
+        features,
+      };
+    } catch (err) {
+      console.error('PlotService: Error in getPlotsGeoJson:', err);
+      throw err;
+    }
   }
 
   async getBuildingsGeoJson() {

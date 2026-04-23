@@ -10,6 +10,7 @@ import { MaintenanceRequest } from '../entities/MaintenanceRequest.entity';
 import { BuildingPlot } from '../entities/BuildingPlot.entity';
 import { RoadPlot } from '../entities/RoadPlot.entity';
 import { PlotReservation } from '../entities/PlotReservation.entity';
+import { BurialSchedule } from 'src/entities/BurialSchedule.entity';
 
 @Module({
   imports: [
@@ -22,9 +23,10 @@ import { PlotReservation } from '../entities/PlotReservation.entity';
       BuildingPlot,
       RoadPlot,
       PlotReservation,
+      BurialSchedule
     ]),
   ],
   controllers: [AdminController],
   providers: [AdminService],
 })
-export class AdminModule {}
+export class AdminModule { }

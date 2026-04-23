@@ -7,6 +7,7 @@ import { User } from '../entities/User.entity';
 import { BurialRequest } from '../entities/BurialRequest.entity';
 import { MaintenanceRequest } from '../entities/MaintenanceRequest.entity';
 import { PlotReservation } from '../entities/PlotReservation.entity';
+import { BurialSchedule } from '../entities/BurialSchedule.entity';
 
 @Injectable()
 export class AdminService {
@@ -24,6 +25,8 @@ export class AdminService {
     private maintenanceRequestRepository: Repository<MaintenanceRequest>,
     @InjectRepository(PlotReservation)
     private plotReservationRepository: Repository<PlotReservation>,
+    @InjectRepository(BurialSchedule)
+    private burialScheduleRepository: Repository<BurialSchedule>,
   ) { }
 
   async getDashboardMetrics() {
@@ -82,6 +85,13 @@ export class AdminService {
       upcoming_pending,
       recent_maintenance,
     };
+  }
+
+  async getBurialSchedule() {
+    return this.burialScheduleRepository.find({
+      relations: ['plot', 'requester'],
+      order: { scheduled_date: 'ASC' },
+    });
   }
 
   async getAllGrave() {
@@ -175,6 +185,17 @@ export class AdminService {
     return this.userRepository.find({ where: { role: 'visitor' } });
   }
 
+  async updateVisitor(id: string, visitorData: any) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Visitor not found');
+    }
+
+    // Sanitize or filter fields if necessary, but here we can update directly
+    await this.userRepository.update(id, visitorData);
+    return this.userRepository.findOne({ where: { id } });
+  }
+
   async getPlots() {
     return this.plotRepository.find();
   }
@@ -213,40 +234,51 @@ export class AdminService {
   }
 
   async confirmBurialRequestAsAdmin(id: string) {
-    try {
-      const request = await this.burialRequestRepository.findOne({ where: { id } });
-      if (!request) {
-        throw new NotFoundException('Burial request not found');
+    return await this.dataSource.transaction(async (manager) => {
+      try {
+        const request = await manager.findOne(BurialRequest, { where: { id } });
+        if (!request) {
+          throw new NotFoundException('Burial request not found');
+        }
+
+        // 1. Update plot status to occupied if plot_id exists
+        if (request.plot_id) {
+          await manager.update(Plot, request.plot_id, {
+            status: 'occupied',
+            updated_at: new Date(),
+          });
+
+          // 2. Clear any reservations for this plot
+          await manager.delete(PlotReservation, { plot_id: request.plot_id });
+        }
+
+        // 3. Create Burial Schedule
+        console.log('Attempting to save burial schedule for request:', request.id);
+
+        const uid = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const burialSched = manager.create(BurialSchedule, {
+          uid: uid,
+          plot_id: request.plot_id || null,
+          requester_id: request.requester_id || request.family_contact || null,
+          deceased_name: request.deceased_name,
+          scheduled_date: request.burial_date,
+          status: 'pending',
+        } as any);
+
+        const savedSched = await manager.save(BurialSchedule, burialSched);
+        console.log('Successfully saved burial schedule:', savedSched.id);
+
+        // 4. Delete the burial request
+        await manager.delete(BurialRequest, request.id);
+
+        return { success: true, data: savedSched };
+      } catch (error) {
+        console.log('Error in confirmBurialRequestAsAdmin:', error);
+        throw error; // Rethrow to trigger transaction rollback
       }
-
-      request.status = 'approved';
-      request.updated_at = new Date();
-
-      await this.plotRepository.update(request.plot_id, {
-        status: 'occupied',
-        updated_at: new Date(),
-      });
-
-      await this.plotReservationRepository.delete({ plot_id: request.plot_id });
-
-      await this.burialRequestRepository.delete(request.id);
-
-      const uid = Math.random().toString(36).substring(2, 7).toUpperCase();
-      const graveToSave = this.graveRepository.create({
-        uid: uid,
-        plot_id: request.plot_id,
-        deceased_name: request.deceased_name,
-        birth_date: request.birth_date,
-        death_date: request.death_date,
-        burial_date: request.burial_date,
-        family_contact: request.family_contact ? request.family_contact.toString() : undefined,
-      });
-      const grave = await this.graveRepository.save(graveToSave);
-
-      return { success: true, data: grave };
-    } catch (error) {
-      console.log(error);
-      return { success: false, data: error };
-    }
+    }).catch(error => {
+      console.error('Transaction failed:', error);
+      return { success: false, data: error.message || error };
+    });
   }
 }
