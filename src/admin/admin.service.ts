@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Plot } from '../entities/Plot.entity';
@@ -28,6 +28,16 @@ export class AdminService {
     @InjectRepository(BurialSchedule)
     private burialScheduleRepository: Repository<BurialSchedule>,
   ) { }
+
+  async onModuleInit() {
+    try {
+      console.log('--- Running manual migration: ALTER TABLE graves ALTER COLUMN family_contact TYPE text ---');
+      await this.dataSource.query(`ALTER TABLE graves ALTER COLUMN family_contact TYPE text;`);
+      console.log('--- Migration successful ---');
+    } catch (error) {
+      console.warn('--- Migration skipped or failed (might already be text):', error.message, '---');
+    }
+  }
 
   async getDashboardMetrics() {
     // --- counts ---
