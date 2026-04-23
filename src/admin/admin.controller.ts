@@ -51,8 +51,7 @@ export class AdminController {
   /* --- Burial Records --- */
   @Get('burial-records')
   async getBurialRecords() {
-    // This will be expanded later
-    return [];
+    return this.adminService.getAllGrave();
   }
 
   @Get('burial-requests')

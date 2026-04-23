@@ -95,7 +95,10 @@ export class AdminService {
   }
 
   async getAllGrave() {
-    return this.graveRepository.find({ where: { is_delete: false } });
+    return this.graveRepository.find({
+      where: { is_delete: false },
+      relations: ['plot'],
+    });
   }
 
   async addPlot(plotData: any) {
@@ -162,14 +165,20 @@ export class AdminService {
     await queryRunner.startTransaction();
 
     try {
+      if (!graveData.uid) {
+        graveData.uid = Math.random().toString(36).substring(2, 7).toUpperCase();
+      }
+
       const grave = queryRunner.manager.create(Grave, graveData);
       const savedGrave = await queryRunner.manager.save(grave);
 
       // Update plot status
-      await queryRunner.manager.update(Plot, graveData.plot_id, {
-        status: 'occupied',
-        updated_at: new Date(),
-      });
+      if (graveData.plot_id) {
+        await queryRunner.manager.update(Plot, graveData.plot_id, {
+          status: 'occupied',
+          updated_at: new Date(),
+        });
+      }
 
       await queryRunner.commitTransaction();
       return savedGrave;

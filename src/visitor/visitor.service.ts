@@ -103,6 +103,7 @@ export class VisitorService {
   async getMyDeceasedFamily(userId: string) {
     return this.graveRepository.find({
       where: { user_id: userId },
+      relations: ['plot'],
       order: { created_at: 'DESC' },
     });
   }
