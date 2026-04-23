@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Patch, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
 
 @Controller('admin')
@@ -80,7 +80,7 @@ export class AdminController {
   async getVisitors() {
     return this.adminService.getVisitors();
   }
-  
+
   @Put('visitors/:id')
   async updateVisitor(@Param('id') id: string, @Body() body: any) {
     return this.adminService.updateVisitor(id, body);
@@ -116,6 +116,11 @@ export class AdminController {
   @Put('burial-requests/confirm/:id')
   async confirmBurialRequestPutAlias(@Param('id') id: string) {
     return this.adminService.confirmBurialRequestAsAdmin(id);
+  }
+
+  @Put('burial-schedule/confirm')
+  async updateBurialScheduleStatus(@Query('id') id: string) {
+    return this.adminService.updateBurialScheduleStatus(id);
   }
 }
 

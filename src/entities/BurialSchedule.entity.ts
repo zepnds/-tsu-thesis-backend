@@ -22,6 +22,12 @@ export class BurialSchedule {
   @Column({ type: 'date', nullable: true })
   scheduled_date: Date;
 
+  @Column({ type: 'date', nullable: true })
+  birth_date: Date;
+
+  @Column({ type: 'date', nullable: true })
+  death_date: Date;
+
   @Column({ type: 'text', nullable: true })
   scheduled_time: string;
 

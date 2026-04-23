@@ -262,6 +262,8 @@ export class AdminService {
           requester_id: request.requester_id || request.family_contact || null,
           deceased_name: request.deceased_name,
           scheduled_date: request.burial_date,
+          birth_date: request.birth_date || null,
+          death_date: request.death_date || null,
           status: 'pending',
         } as any);
 
@@ -280,5 +282,48 @@ export class AdminService {
       console.error('Transaction failed:', error);
       return { success: false, data: error.message || error };
     });
+  }
+
+  async updateBurialScheduleStatus(id: string) {
+    try {
+      const schedule = await this.burialScheduleRepository.findOne({ where: { id } });
+      if (!schedule) {
+        throw new NotFoundException('Burial schedule not found');
+      }
+
+      if (schedule.plot_id) {
+        await this.plotRepository.update(schedule.plot_id, {
+          status: 'occupied',
+          updated_at: new Date(),
+        });
+      }
+
+      const uid = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const graveData = this.graveRepository.create({
+        uid: uid,
+        plot_id: schedule.plot_id,
+        deceased_name: schedule.deceased_name,
+        birth_date: schedule.birth_date,
+        death_date: schedule.death_date,
+        is_active: true,
+        user_id: schedule.requester_id,
+        burial_date: schedule.scheduled_date,
+        created_at: new Date(),
+        updated_at: new Date(),
+      } as any);
+
+      console.log('Saving grave data:', graveData);
+      const savedGrave: any = await this.graveRepository.save(graveData);
+      console.log('Saved grave:', savedGrave?.id);
+
+
+      await this.burialScheduleRepository.delete(schedule.id);
+      console.log('Deleted schedule:', schedule.id);
+
+      return { success: true, data: savedGrave };
+    } catch (error) {
+      console.error('Error in updateBurialScheduleStatus:', error);
+      return { success: false, error: error.message || error };
+    }
   }
 }
