@@ -10,7 +10,7 @@ import { MaintenanceRequest } from '../entities/MaintenanceRequest.entity';
 import { BuildingPlot } from '../entities/BuildingPlot.entity';
 import { RoadPlot } from '../entities/RoadPlot.entity';
 import { PlotReservation } from '../entities/PlotReservation.entity';
-import { BurialSchedule } from 'src/entities/BurialSchedule.entity';
+import { BurialSchedule } from '../entities/BurialSchedule.entity';
 
 @Module({
   imports: [

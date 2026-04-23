@@ -44,22 +44,38 @@ export class AuthService {
   }
 
   async sendRegistrationOtp(email: string, username: string) {
+    console.log(`[AuthService] Attempting to send registration OTP to: ${email} (username: ${username})`);
     // Check if user already exists before sending OTP
     const existingEmail = await this.userRepository.findOne({ where: { email } });
-    if (existingEmail) throw new ConflictException('Email already registered');
+    if (existingEmail) {
+      console.log(`[AuthService] Email already registered: ${email}`);
+      throw new ConflictException('Email already registered');
+    }
 
     const existingUser = await this.userRepository.findOne({ where: { username } });
-    if (existingUser) throw new ConflictException('Username already taken');
+    if (existingUser) {
+      console.log(`[AuthService] Username already taken: ${username}`);
+      throw new ConflictException('Username already taken');
+    }
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
+    console.log(`[AuthService] Generated OTP: ${otp} for ${email}`);
+
     // Store OTP with expiration (e.g., 10 minutes = 600000 ms)
     const expires = Date.now() + 600000;
     this.otpStore.set(email, { code: otp, expires });
 
-    // Send email
-    await this.mailingService.sendOtp(email, otp, 'Account Registration');
+    try {
+
+      // In production, we MUST send the email
+      await this.mailingService.sendOtp(email, otp, 'Account Registration');
+      console.log(`[AuthService] OTP email sent successfully to ${email}`);
+
+    } catch (error) {
+      console.error(`[AuthService] Failed to send OTP email to ${email}:`, error.message);
+      throw new BadRequestException('Failed to send verification email. Please check your SMTP configuration or try again later. Error: ' + error.message);
+    }
 
     return { success: true, message: 'OTP sent successfully to ' + email };
   }

@@ -27,7 +27,7 @@ export class MailingService {
     const senderEmail = this.configService.get<string>('SMTP_USER') || 'noreply@sementeryo.com';
 
     const mailOptions = {
-      from: `"Sementeryo System" <${senderEmail}>`,
+      from: `"Garden of Peace" <${senderEmail}>`,
       to,
       subject: `Your OTP for ${purpose}`,
       html: `
