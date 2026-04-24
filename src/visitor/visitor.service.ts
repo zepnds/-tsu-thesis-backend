@@ -90,6 +90,13 @@ export class VisitorService {
     if (requestData.grave_id === '') requestData.grave_id = null;
     if (requestData.reservation_id === '') requestData.reservation_id = null;
 
+    if (requestData.plot_id) {
+      const brequest = await this.burialRequestRepository.findOne({ where: { plot_id: requestData.plot_id } });
+      if (brequest) {
+        throw new ConflictException('You have plot id pending burial requests');
+      }
+    }
+
     const newRequest = this.burialRequestRepository.create({
       ...requestData,
       uid,
@@ -98,9 +105,13 @@ export class VisitorService {
       status: 'pending',
     });
     return this.burialRequestRepository.save(newRequest);
+
+
   }
 
   async getMyBurialRequests(userId: string) {
+
+
     return this.burialRequestRepository.find({
       where: { family_contact: userId },
       relations: ['plot'],
@@ -120,7 +131,7 @@ export class VisitorService {
         "SELECT column_name FROM information_schema.columns WHERE table_name = 'graves'"
       );
       console.log('--- Columns in graves:', columns.map(c => c.column_name).join(', '), '---');
-      
+
       const results = await this.graveRepository.query(
         'SELECT * FROM graves WHERE user_id = $1',
         [userId]
