@@ -92,6 +92,10 @@ export class VisitorService {
 
     if (requestData.plot_id) {
       const brequest = await this.burialRequestRepository.findOne({ where: { plot_id: requestData.plot_id } });
+      const plotRequest = this.reservationRepository.findOne({ where: { plot_id: requestData.plot_id, user_id: userId } });
+      if (!plotRequest) {
+        throw new ConflictException('You have no reservation for this plot id');
+      }
       if (brequest) {
         throw new ConflictException('You have plot id pending burial requests');
       }
@@ -121,22 +125,11 @@ export class VisitorService {
 
   async getMyDeceasedFamily(userId: string) {
     try {
-      console.log('--- getMyDeceasedFamily (DEBUG) for userId:', userId, '---');
-      const tables = await this.graveRepository.query(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
-      );
-      console.log('--- Tables in DB:', tables.map(t => t.table_name).join(', '), '---');
 
-      const columns = await this.graveRepository.query(
-        "SELECT column_name FROM information_schema.columns WHERE table_name = 'graves'"
+      const results = await this.graveRepository.find(
+        { where: { userId } }
       );
-      console.log('--- Columns in graves:', columns.map(c => c.column_name).join(', '), '---');
 
-      const results = await this.graveRepository.query(
-        'SELECT * FROM graves WHERE user_id = $1',
-        [userId]
-      );
-      console.log('--- Found', results.length, 'records ---');
       return results;
     } catch (error) {
       console.error('--- Error in getMyDeceasedFamily:', error, '---');
@@ -152,7 +145,7 @@ export class VisitorService {
       }
     }
     return this.graveRepository.find({
-      where: { plot_id: plotId },
+      where: { plot_id: plotId, userId },
       order: { created_at: 'DESC' },
     });
   }
