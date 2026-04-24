@@ -89,6 +89,25 @@ export class VisitorController {
     return this.visitorService.getMyDeceasedFamilyPlot(userId, plotId);
   }
 
+
+  @Get('graves')
+  async getAllGravesFamily(
+    @Query('q') q?: string,
+    @Query('search') search?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    const searchTerm = q || search;
+    const limitNum = limit ? parseInt(limit, 10) : undefined;
+    const offsetNum = offset ? parseInt(offset, 10) : undefined;
+
+    return this.visitorService.getAllGraves({
+      search: searchTerm,
+      limit: limitNum,
+      offset: offsetNum,
+    });
+  }
+
   /* --- Maintenance Request --- */
   @UseGuards(JwtAuthGuard)
   @Post('request-maintenance')

@@ -82,6 +82,24 @@ export class VisitorService {
     });
   }
 
+  async getAllGraves(options: { search?: string; limit?: number; offset?: number } = {}) {
+    const { search, limit, offset } = options;
+    const findOptions: any = {
+      relations: ['plot'],
+      order: { deceased_name: 'ASC' },
+      take: limit,
+      skip: offset,
+    };
+
+    if (search) {
+      findOptions.where = {
+        deceased_name: ILike(`%${search}%`),
+      };
+    }
+
+    return this.graveRepository.find(findOptions);
+  }
+
   async createBurialRequest(userId: string, requestData: any) {
     const uid = crypto.randomBytes(2).toString('hex').toUpperCase();
 
