@@ -145,8 +145,14 @@ export class VisitorService {
   }
 
   async getMyDeceasedFamilyPlot(userId: string, plotId: string) {
+    if (plotId) {
+      const brequest = await this.graveRepository.findOne({ where: { plot_id: plotId } });
+      if (!brequest?.plot_id) {
+        throw new ConflictException('Request plot id cannot be found');
+      }
+    }
     return this.graveRepository.find({
-      where: { userId: userId, plot_id: plotId },
+      where: { plot_id: plotId },
       order: { created_at: 'DESC' },
     });
   }
