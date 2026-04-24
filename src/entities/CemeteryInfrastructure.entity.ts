@@ -17,7 +17,12 @@ export class CemeteryInfrastructure {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({
+    type: 'geometry',
+    spatialFeatureType: 'Geometry',
+    srid: 4326,
+    nullable: true,
+  })
   coordinates: any;
 
   @Column({

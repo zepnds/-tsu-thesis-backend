@@ -28,6 +28,7 @@ import { MailingModule } from './library/mailing/mailing.module';
         const dbUrl = configService.get<string>('DATABASE_URL') || '';
         console.log('--- DB URL IS:', dbUrl, '---');
         const isLocal = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1');
+
         return {
           type: 'postgres',
           url: dbUrl,

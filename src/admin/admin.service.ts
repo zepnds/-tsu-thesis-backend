@@ -111,6 +111,13 @@ export class AdminService {
     });
   }
 
+  async getAllBurialRecords() {
+    return this.graveRepository.find({
+      where: { is_delete: false },
+      relations: ['plot'],
+    });
+  }
+
   async addPlot(plotData: any) {
     const plot = this.plotRepository.create(plotData);
     return this.plotRepository.save(plot);

@@ -48,4 +48,12 @@ export class GravesService {
     if (result.affected === 0) throw new NotFoundException('Burial record not found');
     return { success: true };
   }
+
+  async findByFamily(userId: string) {
+    return this.graveRepository.find({
+      where: { userId: userId },
+      relations: ['plot'],
+      order: { created_at: 'DESC' },
+    });
+  }
 }

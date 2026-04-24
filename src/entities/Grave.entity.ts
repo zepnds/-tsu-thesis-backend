@@ -42,9 +42,8 @@ export class Grave {
   @Column({ type: 'boolean', default: true, nullable: false })
   is_active: boolean;
 
-  @Column({ type: 'bigint', nullable: true })
-  user_id: string;
-
+  @Column({ name: 'user_id', type: 'bigint', nullable: true })
+  userId: string;
 
   @Column({ type: 'boolean', default: false, nullable: false })
   is_delete: boolean;

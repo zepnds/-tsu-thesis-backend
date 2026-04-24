@@ -29,4 +29,9 @@ export class GravesController {
   async delete(@Param('id') id: string) {
     return this.gravesService.delete(id);
   }
+
+  @Get('graves/family/:id')
+  async findByFamily(@Param('id') id: string) {
+    return this.gravesService.findByFamily(id);
+  }
 }

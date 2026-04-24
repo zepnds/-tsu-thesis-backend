@@ -84,10 +84,17 @@ export class VisitorService {
 
   async createBurialRequest(userId: string, requestData: any) {
     const uid = crypto.randomBytes(2).toString('hex').toUpperCase();
+
+    // Ensure empty strings are treated as null for IDs
+    if (requestData.plot_id === '') requestData.plot_id = null;
+    if (requestData.grave_id === '') requestData.grave_id = null;
+    if (requestData.reservation_id === '') requestData.reservation_id = null;
+
     const newRequest = this.burialRequestRepository.create({
       ...requestData,
       uid,
       family_contact: userId,
+      requester_id: userId,
       status: 'pending',
     });
     return this.burialRequestRepository.save(newRequest);
@@ -96,21 +103,39 @@ export class VisitorService {
   async getMyBurialRequests(userId: string) {
     return this.burialRequestRepository.find({
       where: { family_contact: userId },
-      order: { created_at: 'DESC' },
-    });
-  }
-
-  async getMyDeceasedFamily(userId: string) {
-    return this.graveRepository.find({
-      where: { user_id: userId },
       relations: ['plot'],
       order: { created_at: 'DESC' },
     });
   }
 
+  async getMyDeceasedFamily(userId: string) {
+    try {
+      console.log('--- getMyDeceasedFamily (DEBUG) for userId:', userId, '---');
+      const tables = await this.graveRepository.query(
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+      );
+      console.log('--- Tables in DB:', tables.map(t => t.table_name).join(', '), '---');
+
+      const columns = await this.graveRepository.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'graves'"
+      );
+      console.log('--- Columns in graves:', columns.map(c => c.column_name).join(', '), '---');
+      
+      const results = await this.graveRepository.query(
+        'SELECT * FROM graves WHERE user_id = $1',
+        [userId]
+      );
+      console.log('--- Found', results.length, 'records ---');
+      return results;
+    } catch (error) {
+      console.error('--- Error in getMyDeceasedFamily:', error, '---');
+      throw error;
+    }
+  }
+
   async getMyDeceasedFamilyPlot(userId: string, plotId: string) {
     return this.graveRepository.find({
-      where: { user_id: userId, plot_id: plotId },
+      where: { userId: userId, plot_id: plotId },
       order: { created_at: 'DESC' },
     });
   }

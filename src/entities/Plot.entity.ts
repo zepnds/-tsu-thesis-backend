@@ -72,6 +72,24 @@ export class Plot {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
+  @Column({ type: 'text', nullable: true })
+  person_full_name: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  date_of_birth: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  date_of_death: Date;
+
+  @Column({ type: 'text', nullable: true })
+  contact_phone: string;
+
+  @Column({ type: 'text', nullable: true })
+  contact_email: string;
+
+  @Column({ type: 'text', nullable: true })
+  photo_url: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
