@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from '../entities/User.entity';
 import { MailingService } from '../library/mailing/mailing.service';
+import { ApiResponse } from '../common/dto/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,40 +23,45 @@ export class AuthService {
   async login(identifier: string, pass: string) {
     const user = await this.userRepository.findOne({
       where: [{ email: identifier }, { username: identifier }],
-      select: ['id', 'uid', 'username', 'email', 'password_hash', 'role', 'first_name', 'last_name'],
+      select: ['id', 'uid', 'username', 'email', 'password_hash', 'role', 'first_name', 'last_name', 'address', 'phone'],
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      return ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS');
     }
 
     const isMatch = await bcrypt.compare(pass, user.password_hash);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      return ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS');
     }
 
-    const payload = { id: user.id, role: user.role, username: user.username, email: user.email };
+    const payload = { id: user.id, role: user.role, username: user.username, email: user.email, address: user.address, phone: user.phone, first_name: user.first_name, last_name: user.last_name };
     const { password_hash, ...result } = user;
 
-    return {
+    return ApiResponse.success('Login successful', {
       token: this.jwtService.sign(payload),
       user: result,
-    };
+    });
   }
 
-  async sendRegistrationOtp(email: string, username: string) {
-    console.log(`[AuthService] Attempting to send registration OTP to: ${email} (username: ${username})`);
-    // Check if user already exists before sending OTP
-    const existingEmail = await this.userRepository.findOne({ where: { email } });
-    if (existingEmail) {
-      console.log(`[AuthService] Email already registered: ${email}`);
-      throw new ConflictException('Email already registered');
-    }
+  async sendRegistrationOtp(email: string, username: string, phone: string) {
 
     const existingUser = await this.userRepository.findOne({ where: { username } });
     if (existingUser) {
       console.log(`[AuthService] Username already taken: ${username}`);
-      throw new ConflictException('Username already taken');
+      return ApiResponse.error('Username already taken', null, 'USERNAME_ALREADY_TAKEN');
+    }
+
+    const existingEmail = await this.userRepository.findOne({ where: { email } });
+    if (existingEmail) {
+      console.log(`[AuthService] Email already registered: ${email}`);
+      return ApiResponse.error('Email already registered', null, 'EMAIL_ALREADY_REGISTERED');
+
+    }
+    const existingPhone = await this.userRepository.findOne({ where: { phone } });
+    if (existingPhone) {
+      console.log(`[AuthService] Phone already registered: ${phone}`);
+      return ApiResponse.error('Phone already registered', null, 'PHONE_ALREADY_REGISTERED');
     }
 
     // Generate 6-digit OTP
@@ -77,37 +83,42 @@ export class AuthService {
       throw new BadRequestException('Failed to send verification email. Please check your SMTP configuration or try again later. Error: ' + error.message);
     }
 
-    return { success: true, message: 'OTP sent successfully to ' + email };
+    return ApiResponse.success('OTP sent successfully to ' + email);
   }
 
   async register(userData: any) {
-    const { otp, email, username, password, role, ...rest } = userData;
+    const { otp, email, phone, username, password, role, address, first_name, last_name } = userData;
 
     // Verify OTP
     if (!otp) {
-      throw new BadRequestException('OTP is required for registration');
+      return ApiResponse.error('OTP is required for registration', null, 'OTP_REQUIRED');
     }
 
     const storedOtp = this.otpStore.get(email);
     if (!storedOtp) {
-      throw new BadRequestException('OTP not requested or expired');
+      return ApiResponse.error('OTP not requested or expired', null, 'OTP_NOT_REQUESTED_OR_EXPIRED');
     }
 
     if (storedOtp.code !== otp) {
-      throw new UnauthorizedException('Invalid OTP');
+      return ApiResponse.error('Invalid OTP', null, 'INVALID_OTP');
     }
 
     if (Date.now() > storedOtp.expires) {
       this.otpStore.delete(email);
-      throw new UnauthorizedException('OTP has expired');
+      return ApiResponse.error('OTP has expired', null, 'OTP_EXPIRED');
     }
 
     // OTP is valid, proceed with registration
     const existingEmail = await this.userRepository.findOne({ where: { email } });
-    if (existingEmail) throw new ConflictException('Email already registered');
+    if (existingEmail)
+      return ApiResponse.error('Email already registered', null, 'EMAIL_ALREADY_REGISTERED');
 
     const existingUser = await this.userRepository.findOne({ where: { username } });
-    if (existingUser) throw new ConflictException('Username already taken');
+    if (existingUser)
+      return ApiResponse.error('Username already taken', null, 'USERNAME_ALREADY_TAKEN');
+
+    const existingPhone = await this.userRepository.findOne({ where: { phone } });
+    if (existingPhone) throw new BadRequestException('Phone already taken');
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
@@ -115,12 +126,15 @@ export class AuthService {
     const uid = crypto.randomBytes(2).toString('hex').toUpperCase();
 
     const newUser = this.userRepository.create({
-      ...rest,
+      first_name,
+      last_name,
       email,
       username,
       uid,
       password_hash,
       role: role || 'visitor',
+      address,
+      phone
     });
 
     const savedUser = await this.userRepository.save(newUser);
@@ -129,7 +143,7 @@ export class AuthService {
     this.otpStore.delete(email);
 
     const { password_hash: _, ...result } = savedUser as any;
-    return result;
+    return ApiResponse.success('Registration successful', result);
   }
 
   async getProfile(id: string) {

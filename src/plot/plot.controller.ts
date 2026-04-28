@@ -1,4 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiResponse } from '../common/dto/response.dto';
 import { PlotService } from './plot.service';
 
 @Controller('plot')
@@ -12,7 +13,7 @@ export class PlotController {
 
   @Get('health')
   async health() {
-    return { status: 'ok' };
+    return ApiResponse.success('Service is healthy');
   }
 
   @Get('road-plots')

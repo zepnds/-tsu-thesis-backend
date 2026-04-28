@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { ApiResponse } from '../common/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import * as crypto from 'crypto';
@@ -72,7 +73,8 @@ export class VisitorService {
     plot.status = 'reserved';
     await this.plotRepository.save(plot);
 
-    return this.reservationRepository.save(newReservation);
+    const savedReservation = await this.reservationRepository.save(newReservation);
+    return ApiResponse.success('Plot reserved successfully', savedReservation);
   }
 
   async getMyReservations(userId: string) {
@@ -126,7 +128,8 @@ export class VisitorService {
       requester_id: userId,
       status: 'pending',
     });
-    return this.burialRequestRepository.save(newRequest);
+    const savedRequest = await this.burialRequestRepository.save(newRequest);
+    return ApiResponse.success('Burial request created successfully', savedRequest);
 
 
   }
@@ -191,7 +194,8 @@ export class VisitorService {
       status: 'pending',
     });
 
-    return this.maintenanceRequestRepository.save(newRequest);
+    const savedRequest = await this.maintenanceRequestRepository.save(newRequest);
+    return ApiResponse.success('Maintenance request created successfully', savedRequest);
   }
 
   async getMyMaintenanceRequests(userId: string) {
