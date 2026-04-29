@@ -7,6 +7,7 @@ import { MaintenanceRequest } from '../entities/MaintenanceRequest.entity';
 import { BurialSchedule } from '../entities/BurialSchedule.entity';
 import { MaintenanceSchedule } from '../entities/MaintenanceSchedule.entity';
 import { User } from '../entities/User.entity';
+import { MailingModule } from '../library/mailing/mailing.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { User } from '../entities/User.entity';
       MaintenanceSchedule,
       User,
     ]),
+    MailingModule,
   ],
   controllers: [StaffController],
   providers: [StaffService],

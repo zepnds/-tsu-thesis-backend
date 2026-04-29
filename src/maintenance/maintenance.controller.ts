@@ -23,4 +23,10 @@ export class MaintenanceController {
     const data = await this.service.complete(id, notes);
     return { ok: true, message: 'Completed', data };
   }
+
+  @Patch('/:id/reject')
+  async reject(@Param('id') id: string) {
+    const data = await this.service.reject(id);
+    return { ok: true, message: 'Rejected', data };
+  }
 }

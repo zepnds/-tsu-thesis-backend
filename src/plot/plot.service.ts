@@ -42,8 +42,10 @@ export class PlotService {
     console.log('PlotService: Fetching plots GeoJSON...');
     try {
       const rawData = await this.plotRepository.query(`
-        SELECT id, uid, size_sqm,plot_type, plot_code, price, section_id, plot_name, status, ST_AsGeoJSON(coordinates) as geojson 
-        FROM plots
+        SELECT p.id, p.uid, p.size_sqm, p.plot_type, p.plot_code, p.price, p.section_id, p.plot_name, p.status, 
+               ST_AsGeoJSON(p.coordinates) as geojson,
+               (SELECT string_agg(deceased_name, ', ') FROM graves g WHERE g.plot_id = p.id AND g.is_delete = false) as deceased_names
+        FROM plots p
       `);
       console.log(`PlotService: Found ${rawData?.length} plots`);
 
@@ -68,7 +70,8 @@ export class PlotService {
             section_id: row.section_id,
             size_sqm: row.size_sqm,
             plot_code: row.plot_code,
-            plot_type: row.plot_type
+            plot_type: row.plot_type,
+            deceased_names: row.deceased_names
           },
         };
       });

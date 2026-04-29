@@ -106,10 +106,20 @@ export class AdminController {
     return this.adminService.approveReservationAsAdmin(id);
   }
 
+  @Patch('reservations/:id/reject')
+  async rejectReservation(@Param('id') id: string) {
+    return this.adminService.rejectReservationAsAdmin(id);
+  }
+
   /* --- Burial Requests --- */
   @Post('burial-requests/:id/confirm')
   async confirmBurialRequestPost(@Param('id') id: string) {
     return this.adminService.confirmBurialRequestAsAdmin(id);
+  }
+
+  @Post('burial-requests/:id/reject')
+  async rejectBurialRequest(@Param('id') id: string) {
+    return this.adminService.rejectBurialRequestAsAdmin(id);
   }
 
   @Post('burial-requests/confirm/:id')

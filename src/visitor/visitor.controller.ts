@@ -170,8 +170,8 @@ export class VisitorController {
 
   @UseGuards(JwtAuthGuard)
   @Get('my-deceased-family-grave')
-  async getMyDeceasedFamilyPlot(@Query('userId') userId: string, @Query('plotId') plotId: string) {
-    return this.visitorService.getMyDeceasedFamilyPlot(userId, plotId);
+  async getMyDeceasedFamilyPlot(@Query('userId') userId: string, @Query('q') q: string) {
+    return this.visitorService.getMyDeceasedFamilyPlot(userId, q);
   }
 
 

@@ -33,4 +33,9 @@ export class AuthController {
   async updateProfile(@Req() req: any, @Body() body: any) {
     return this.authService.updateProfile(req.user.id, body);
   }
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout() {
+    return this.authService.logout();
+  }
 }

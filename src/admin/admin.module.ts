@@ -11,6 +11,7 @@ import { BuildingPlot } from '../entities/BuildingPlot.entity';
 import { RoadPlot } from '../entities/RoadPlot.entity';
 import { PlotReservation } from '../entities/PlotReservation.entity';
 import { BurialSchedule } from '../entities/BurialSchedule.entity';
+import { MailingModule } from '../library/mailing/mailing.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { BurialSchedule } from '../entities/BurialSchedule.entity';
       PlotReservation,
       BurialSchedule
     ]),
+    MailingModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

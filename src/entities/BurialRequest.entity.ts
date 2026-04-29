@@ -24,6 +24,9 @@ export class BurialRequest {
   @Column({ type: 'date', nullable: false })
   burial_date: Date;
 
+  @Column({ type: 'text', nullable: true })
+  burial_time: string;
+
   @Column({ type: 'bigint', nullable: true })
   family_contact: string;
 

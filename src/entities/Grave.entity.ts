@@ -25,6 +25,9 @@ export class Grave {
   burial_date: Date;
 
   @Column({ type: 'text', nullable: true })
+  burial_time: string;
+
+  @Column({ type: 'text', nullable: true })
   qr_token: string;
 
   @Column({ type: 'text', nullable: true })

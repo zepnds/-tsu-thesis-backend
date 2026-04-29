@@ -8,6 +8,7 @@ import { BurialRequest } from '../entities/BurialRequest.entity';
 import { MaintenanceRequest } from '../entities/MaintenanceRequest.entity';
 import { PlotReservation } from '../entities/PlotReservation.entity';
 import { BurialSchedule } from '../entities/BurialSchedule.entity';
+import { MailingService } from '../library/mailing/mailing.service';
 
 @Injectable()
 export class AdminService {
@@ -27,15 +28,23 @@ export class AdminService {
     private plotReservationRepository: Repository<PlotReservation>,
     @InjectRepository(BurialSchedule)
     private burialScheduleRepository: Repository<BurialSchedule>,
+    private mailingService: MailingService,
   ) { }
 
   async onModuleInit() {
     try {
-      console.log('--- Running manual migration: ALTER TABLE graves ALTER COLUMN family_contact TYPE text ---');
-      await this.dataSource.query(`ALTER TABLE graves ALTER COLUMN family_contact TYPE text;`);
+      console.log('--- Running manual migration: ALTER TABLE burial_requests ADD COLUMN IF NOT EXISTS burial_time text ---');
+      await this.dataSource.query(`ALTER TABLE burial_requests ADD COLUMN IF NOT EXISTS burial_time text;`);
+
+      console.log('--- Running manual migration: ALTER TABLE burial_schedules ADD COLUMN IF NOT EXISTS scheduled_time text ---');
+      await this.dataSource.query(`ALTER TABLE burial_schedules ADD COLUMN IF NOT EXISTS scheduled_time text;`);
+
+      console.log('--- Running manual migration: ALTER TABLE graves ADD COLUMN IF NOT EXISTS burial_time text ---');
+      await this.dataSource.query(`ALTER TABLE graves ADD COLUMN IF NOT EXISTS burial_time text;`);
+
       console.log('--- Migration successful ---');
     } catch (error) {
-      console.warn('--- Migration skipped or failed (might already be text):', error.message, '---');
+      console.warn('--- Migration skipped or failed:', error.message, '---');
     }
   }
 
@@ -152,6 +161,8 @@ export class AdminService {
     if (plotData.person_full_name !== undefined) graveFieldsToUpdate.deceased_name = plotData.person_full_name;
     if (plotData.date_of_birth !== undefined) graveFieldsToUpdate.birth_date = plotData.date_of_birth;
     if (plotData.date_of_death !== undefined) graveFieldsToUpdate.death_date = plotData.date_of_death;
+    if (plotData.burial_date !== undefined) graveFieldsToUpdate.burial_date = plotData.burial_date;
+    if (plotData.burial_time !== undefined) graveFieldsToUpdate.burial_time = plotData.burial_time;
     if (plotData.qr_token !== undefined) graveFieldsToUpdate.qr_token = plotData.qr_token;
 
     if (Object.keys(graveFieldsToUpdate).length > 0) {
@@ -231,6 +242,7 @@ export class AdminService {
 
   async getMaintenanceRequests() {
     return this.maintenanceRequestRepository.find({
+      relations: ['plot', 'requester', 'assigned_staff'],
       order: { created_at: 'DESC' },
     });
   }
@@ -243,7 +255,10 @@ export class AdminService {
   }
 
   async approveReservationAsAdmin(id: string) {
-    const reservation = await this.plotReservationRepository.findOne({ where: { id } });
+    const reservation = await this.plotReservationRepository.findOne({
+      where: { id },
+      relations: ['user', 'plot']
+    });
     if (!reservation) {
       throw new NotFoundException('Reservation not found');
     }
@@ -253,13 +268,42 @@ export class AdminService {
 
     await this.plotReservationRepository.save(reservation);
 
+    if (reservation && reservation.user && reservation.user.email) {
+      const subject = 'Plot Reservation Approved';
+      const plotInfo = reservation.plot_id ? ` for Plot ${reservation.plot_id}` : '';
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #2d3748;">Reservation Approved</h2>
+          <p>Hello <strong>${reservation.user.username}</strong>,</p>
+          <p>We are pleased to inform you that your plot reservation request${plotInfo} has been <strong>approved</strong>.</p>
+          <p><strong>Reservation Details:</strong></p>
+          <ul>
+            <li><strong>UID:</strong> ${reservation.uid}</li>
+            <li><strong>Status:</strong> Approved</li>
+            <li><strong>Date:</strong> ${new Date().toLocaleDateString()}</li>
+          </ul>
+          <p>Thank you for using our service.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #718096;">This is an automated message, please do not reply.</p>
+        </div>
+      `;
+      try {
+        await this.mailingService.sendEmail(reservation.user.email, subject, htmlContent);
+      } catch (error) {
+        console.error('Failed to send reservation approval email:', error);
+      }
+    }
+
     return { success: true, data: reservation };
   }
 
   async confirmBurialRequestAsAdmin(id: string) {
     return await this.dataSource.transaction(async (manager) => {
       try {
-        const request = await manager.findOne(BurialRequest, { where: { id } });
+        const request = await manager.findOne(BurialRequest, {
+          where: { id },
+          relations: ['requester', 'plot']
+        });
         if (!request) {
           throw new NotFoundException('Burial request not found');
         }
@@ -285,6 +329,7 @@ export class AdminService {
           deceased_name: request.deceased_name,
           plot_id: request.plot_id || null,
           scheduled_date: request.burial_date,
+          scheduled_time: request.burial_time || null,
           birth_date: request.birth_date || null,
           death_date: request.death_date || null,
           status: 'pending',
@@ -294,13 +339,51 @@ export class AdminService {
         console.log('Successfully saved burial schedule:', savedSched.id);
 
         // 4. Delete the burial request
+        const requesterInfo = request.requester;
+        const plotInfo = request.plot_id;
         await manager.delete(BurialRequest, request.id);
+
+        console.log("plotInfo", plotInfo)
+
+        // 5. Send email notification (After deletion is fine as we have the info)
+        if (requesterInfo && requesterInfo.email) {
+          const subject = 'Burial Request Confirmed';
+          const plotText = plotInfo ? ` for Plot ${plotInfo}` : '';
+          const htmlContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+              <h2 style="color: #2d3748;">Burial Request Confirmed</h2>
+              <p>Hello <strong>${requesterInfo.username}</strong>,</p>
+              <p>Your burial request for <strong>${request.deceased_name}</strong>${plotText} has been <strong>confirmed</strong> and scheduled.</p>
+              <p><strong>Request Details:</strong></p>
+              <ul>
+                <li><strong>Deceased:</strong> ${request.deceased_name}</li>
+                <li><strong>Scheduled Date:</strong> ${new Date(request.burial_date).toLocaleDateString()}</li>
+                <li><strong>Scheduled Time:</strong> ${request.burial_time || 'TBD'}</li>
+                <li><strong>Status:</strong> Confirmed (Scheduled)</li>
+              </ul>
+              <p>A burial schedule has been created. You can view the details in your dashboard.</p>
+              <p style="background-color: #fffaf0; padding: 10px; border-left: 4px solid #ed8936;">
+                <strong>Note:</strong> Please also apply for your plot reservation to finalize the process.
+              </p>
+              <p>Thank you for using our service.</p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+              <p style="font-size: 12px; color: #718096;">This is an automated message, please do not reply.</p>
+            </div>
+          `;
+          try {
+            await this.mailingService.sendEmail(requesterInfo.email, subject, htmlContent);
+          } catch (err) {
+            console.error('Failed to send burial confirmation email:', err);
+          }
+        }
 
         return { success: true, data: savedSched };
       } catch (error) {
         console.log('Error in confirmBurialRequestAsAdmin:', error);
         throw error; // Rethrow to trigger transaction rollback
       }
+    }).then(async (result) => {
+      return result;
     }).catch(error => {
       console.error('Transaction failed:', error);
       return { success: false, data: error.message || error };
@@ -310,7 +393,10 @@ export class AdminService {
   async updateBurialScheduleStatus(id: string) {
     return await this.dataSource.transaction(async (manager) => {
       try {
-        const schedule = await manager.findOne(BurialSchedule, { where: { id } });
+        const schedule = await manager.findOne(BurialSchedule, {
+          where: { id },
+          relations: ['requester', 'plot']
+        });
         if (!schedule) {
           throw new NotFoundException('Burial schedule not found');
         }
@@ -330,6 +416,7 @@ export class AdminService {
           birth_date: schedule.birth_date,
           death_date: schedule.death_date,
           burial_date: schedule.scheduled_date,
+          burial_time: schedule.scheduled_time,
           is_active: true,
           userId: schedule.requester_id, // Match Grave entity property 'userId'
           created_at: new Date(),
@@ -343,6 +430,35 @@ export class AdminService {
         await manager.delete(BurialSchedule, id);
         console.log('Deleted schedule ID:', id);
 
+        // Send email notification
+        if (schedule.requester && schedule.requester.email) {
+          const subject = 'Burial Service Completed';
+          const plotText = schedule.plot ? ` for Plot ${schedule.plot.plot_code}` : '';
+          const htmlContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+              <h2 style="color: #2d3748;">Burial Service Completed</h2>
+              <p>Hello <strong>${schedule.requester.username}</strong>,</p>
+              <p>The burial service for <strong>${schedule.deceased_name}</strong>${plotText} has been successfully <strong>completed</strong> and recorded in our system.</p>
+              <p><strong>Service Details:</strong></p>
+              <ul>
+                <li><strong>Deceased:</strong> ${schedule.deceased_name}</li>
+                <li><strong>Date:</strong> ${new Date(schedule.scheduled_date).toLocaleDateString()}</li>
+                <li><strong>Time:</strong> ${schedule.scheduled_time || 'N/A'}</li>
+                <li><strong>Status:</strong> Completed</li>
+              </ul>
+              <p>You can now view the burial record and access the digital memorial in your dashboard.</p>
+              <p>Thank you for using our service.</p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+              <p style="font-size: 12px; color: #718096;">This is an automated message, please do not reply.</p>
+            </div>
+          `;
+          try {
+            await this.mailingService.sendEmail(schedule.requester.email, subject, htmlContent);
+          } catch (err) {
+            console.error('Failed to send burial completion email:', err);
+          }
+        }
+
         return { success: true, data: savedGrave };
       } catch (error) {
         console.error('Error in updateBurialScheduleStatus transaction:', error);
@@ -352,5 +468,77 @@ export class AdminService {
       console.error('Transaction failed:', error);
       return { success: false, error: error.message || error };
     });
+  }
+
+  async rejectReservationAsAdmin(id: string) {
+    const reservation = await this.plotReservationRepository.findOne({
+      where: { id },
+      relations: ['user', 'plot']
+    });
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    reservation.status = 'rejected';
+    reservation.updated_at = new Date();
+
+    await this.plotReservationRepository.save(reservation);
+
+    if (reservation.user?.email) {
+      const subject = 'Plot Reservation Update';
+      const plotInfo = reservation.plot_id ? ` for Plot ${reservation.plot_id}` : '';
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #2d3748;">Reservation Request Disapproved</h2>
+          <p>Hello <strong>${reservation.user.username}</strong>,</p>
+          <p>We regret to inform you that your plot reservation request${plotInfo} has been <strong>rejected/disapproved</strong>.</p>
+          <p>Please contact the cemetery office for more details.</p>
+          <p>Thank you.</p>
+        </div>
+      `;
+      try {
+        await this.mailingService.sendEmail(reservation.user.email, subject, htmlContent);
+      } catch (error) {
+        console.error('Failed to send reservation rejection email:', error);
+      }
+    }
+
+    return { success: true, data: reservation };
+  }
+
+  async rejectBurialRequestAsAdmin(id: string) {
+    const request = await this.burialRequestRepository.findOne({
+      where: { id },
+      relations: ['requester', 'plot']
+    });
+    if (!request) {
+      throw new NotFoundException('Burial request not found');
+    }
+
+    request.status = 'rejected';
+    request.updated_at = new Date();
+
+    await this.burialRequestRepository.save(request);
+
+    if (request.requester?.email) {
+      const subject = 'Burial Request Update';
+      const plotText = request.plot_id ? ` for Plot ${request.plot_id}` : '';
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #2d3748;">Burial Request Disapproved</h2>
+          <p>Hello <strong>${request.requester.username}</strong>,</p>
+          <p>We regret to inform you that your burial request for <strong>${request.deceased_name}</strong>${plotText} has been <strong>rejected/disapproved</strong>.</p>
+          <p>Please contact the cemetery office for further assistance.</p>
+          <p>Thank you.</p>
+        </div>
+      `;
+      try {
+        await this.mailingService.sendEmail(request.requester.email, subject, htmlContent);
+      } catch (err) {
+        console.error('Failed to send burial rejection email:', err);
+      }
+    }
+
+    return { success: true, data: request };
   }
 }

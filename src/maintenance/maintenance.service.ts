@@ -2,12 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MaintenanceRequest } from '../entities/MaintenanceRequest.entity';
+import { MailingService } from '../library/mailing/mailing.service';
 
 @Injectable()
 export class MaintenanceService {
   constructor(
     @InjectRepository(MaintenanceRequest)
     private maintenanceRepository: Repository<MaintenanceRequest>,
+    private mailingService: MailingService,
   ) {}
 
   async findAll(status?: string) {
@@ -41,6 +43,23 @@ export class MaintenanceService {
     });
 
     if (!saved) throw new NotFoundException('Maintenance request not found');
+
+    // Send Email
+    if (saved.requester?.email) {
+      const dateStr = saved.scheduled_date ? new Date(saved.scheduled_date).toLocaleDateString() : 'TBD';
+      const timeStr = saved.scheduled_time || 'TBD';
+      await this.mailingService.sendEmail(
+        saved.requester.email,
+        'Maintenance Request Scheduled',
+        `<h1>Maintenance Scheduled</h1>
+         <p>Hello ${saved.requester.first_name},</p>
+         <p>Your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been scheduled.</p>
+         <p><strong>Date:</strong> ${dateStr}</p>
+         <p><strong>Time:</strong> ${timeStr}</p>
+         <p>Thank you.</p>`,
+      );
+    }
+
     return saved;
   }
 
@@ -57,6 +76,49 @@ export class MaintenanceService {
     });
 
     if (!saved) throw new NotFoundException('Maintenance request not found');
+
+    // Send Email
+    if (saved.requester?.email) {
+      await this.mailingService.sendEmail(
+        saved.requester.email,
+        'Maintenance Request Completed',
+        `<h1>Maintenance Completed</h1>
+         <p>Hello ${saved.requester.first_name},</p>
+         <p>Your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been marked as completed.</p>
+         ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
+         <p>Thank you.</p>`,
+      );
+    }
+
+    return saved;
+  }
+
+  async reject(id: string) {
+    await this.maintenanceRepository.update(id, {
+      status: 'rejected',
+      updated_at: new Date(),
+    });
+
+    const saved = await this.maintenanceRepository.findOne({
+      where: { id },
+      relations: ['requester'],
+    });
+
+    if (!saved) throw new NotFoundException('Maintenance request not found');
+
+    // Send Email
+    if (saved.requester?.email) {
+      await this.mailingService.sendEmail(
+        saved.requester.email,
+        'Maintenance Request Rejected',
+        `<h1>Maintenance Request Update</h1>
+         <p>Hello ${saved.requester.first_name},</p>
+         <p>We regret to inform you that your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been disapproved/rejected.</p>
+         <p>Please contact the office for more information.</p>
+         <p>Thank you.</p>`,
+      );
+    }
+
     return saved;
   }
 }

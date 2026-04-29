@@ -190,4 +190,8 @@ export class AuthService {
       throw error;
     }
   }
+
+  async logout() {
+    return ApiResponse.success('Logged out successfully');
+  }
 }

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { ApiResponse } from '../common/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, Brackets } from 'typeorm';
 import * as crypto from 'crypto';
 import { Plot } from '../entities/Plot.entity';
 import { PlotReservation } from '../entities/PlotReservation.entity';
@@ -161,6 +161,7 @@ export class VisitorService {
   async getMyDeceasedFamily(userId: string) {
     try {
       const results = await this.graveRepository.createQueryBuilder('grave')
+        .leftJoinAndSelect('grave.plot', 'plot')
         .where('grave.user_id = :userId::bigint', { userId })
         .getMany();
 
@@ -171,20 +172,27 @@ export class VisitorService {
     }
   }
 
-  async getMyDeceasedFamilyPlot(userId: string, plotId: string) {
-    if (plotId) {
-      const brequest = await this.graveRepository.createQueryBuilder('grave')
-        .where('grave.plot_id = :plotId::bigint', { plotId })
-        .getOne();
-      if (!brequest?.plot_id) {
-        throw new ConflictException('Request plot id cannot be found');
-      }
+  async getMyDeceasedFamilyPlot(userId: string, search: string) {
+    const qb = this.graveRepository.createQueryBuilder('grave')
+      .leftJoinAndSelect('grave.plot', 'plot')
+      .orderBy('grave.deceased_name', 'ASC');
+
+    if (search) {
+      const isNumeric = /^\d+$/.test(search);
+      qb.andWhere(new Brackets(innerQb => {
+        innerQb.where('grave.deceased_name ILIKE :search', { search: `%${search}%` })
+          .orWhere('plot.plot_code ILIKE :search', { search: `%${search}%` })
+          .orWhere('plot.plot_name ILIKE :search', { search: `%${search}%` });
+        
+        if (isNumeric) {
+          innerQb.orWhere('grave.plot_id = :plotId::bigint', { plotId: search });
+        }
+      }));
+    } else {
+      qb.andWhere('grave.user_id = :userId::bigint', { userId });
     }
-    return this.graveRepository.createQueryBuilder('grave')
-      .where('grave.plot_id = :plotId::bigint', { plotId })
-      .andWhere('grave.user_id = :userId::bigint', { userId })
-      .orderBy('grave.created_at', 'DESC')
-      .getMany();
+
+    return qb.getMany();
   }
 
   async createMaintenanceRequest(userId: string, requestData: any) {
@@ -202,16 +210,42 @@ export class VisitorService {
     if (requestData.plot_id === '') requestData.plot_id = null;
     if (requestData.grave_id === '') requestData.grave_id = null;
 
-    const newRequest = this.maintenanceRequestRepository.create({
-      ...requestData,
-      uid,
-      requester_id: userId,
-      request_type: requestData.request_type || 'Maintenance',
-      status: 'pending',
+    const plots = await this.plotRepository.findOne({
+      where: { id: requestData.plot_id }
     });
 
-    const savedRequest = await this.maintenanceRequestRepository.save(newRequest);
-    return ApiResponse.success('Maintenance request created successfully', savedRequest);
+    if (plots?.status === "available") {
+      return ApiResponse.error('Invalid maintenance request: Plot is not yet occupied', 403);
+    }
+
+    const graveExist = await this.graveRepository.findOne({
+      where: { plot_id: requestData.plot_id, userId: userId }
+    });
+
+    const graveRequestExist = await this.maintenanceRequestRepository.findOne({
+      where: { plot_id: requestData.plot_id, requester_id: userId, status: "pending" }
+    })
+
+    if (graveRequestExist) {
+      return ApiResponse.error(`Invalid maintenance request: You have pending maintenance requests for the selected plot id: ${requestData.plot_id}`, 403);
+    }
+
+    if (!graveExist) {
+      return ApiResponse.error('Invalid maintenance request: Grave does not belong to you', 403);
+    } else {
+      const newRequest = this.maintenanceRequestRepository.create({
+        ...requestData,
+        uid,
+        requester_id: userId,
+        request_type: requestData.request_type || 'Maintenance',
+        status: 'pending',
+      });
+
+      const savedRequest = await this.maintenanceRequestRepository.save(newRequest);
+      return ApiResponse.success('Maintenance request created successfully', savedRequest);
+    }
+
+
   }
 
   async getMyMaintenanceRequests(userId: string) {
