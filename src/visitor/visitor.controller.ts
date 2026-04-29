@@ -1,4 +1,8 @@
-import { Controller, Get, Post, Patch, Body, Query, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Query, Param, Req, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import * as fs from 'fs';
 import { VisitorService } from './visitor.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -58,16 +62,97 @@ export class VisitorController {
   /* --- Burial Request --- */
   @UseGuards(JwtAuthGuard)
   @Post('request-burial')
-  async createBurialRequest(@Body() body: any, @Req() req: any) {
+  @UseInterceptors(
+    FileInterceptor('death_certificate', {
+      storage: diskStorage({
+        destination: './uploads/death-certificates',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `death-cert-${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async createBurialRequest(@Body() body: any, @Req() req: any, @UploadedFile() file: any) {
     const userId = req.user.id;
-    return this.visitorService.createBurialRequest(userId, body);
+    const requestData = { ...body };
+    if (file) {
+      requestData.death_certificate_url = `/uploads/death-certificates/${file.filename}`;
+      // Ensure directory exists
+      if (!fs.existsSync('./uploads/death-certificates')) {
+        fs.mkdirSync('./uploads/death-certificates', { recursive: true });
+      }
+    }
+    return this.visitorService.createBurialRequest(userId, requestData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('burial-request')
-  async createBurialRequestAlias(@Body() body: any, @Req() req: any) {
+  @UseInterceptors(
+    FileInterceptor('death_certificate', {
+      storage: diskStorage({
+        destination: './uploads/death-certificates',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `death-cert-${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          return cb(new BadRequestException('Only JPG, JPEG, and PNG files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async createBurialRequestAlias(@Body() body: any, @Req() req: any, @UploadedFile() file: any) {
     const userId = req.user.id;
-    return this.visitorService.createBurialRequest(userId, body);
+    const requestData = { ...body };
+    if (file) {
+      requestData.death_certificate_url = `/uploads/death-certificates/${file.filename}`;
+      // Ensure directory exists
+      if (!fs.existsSync('./uploads/death-certificates')) {
+        fs.mkdirSync('./uploads/death-certificates', { recursive: true });
+      }
+    }
+    return this.visitorService.createBurialRequest(userId, requestData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('burial-requests/:id/death-certificate')
+  @UseInterceptors(
+    FileInterceptor('death_certificate', {
+      storage: diskStorage({
+        destination: './uploads/death-certificates',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `death-cert-${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          return cb(new BadRequestException('Only JPG, JPEG, and PNG files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async uploadDeathCertificate(
+    @Param('id') id: string,
+    @UploadedFile() file: any,
+  ) {
+    if (!file) {
+      return { success: false, message: 'No file uploaded' };
+    }
+
+    // Ensure directory exists
+    if (!fs.existsSync('./uploads/death-certificates')) {
+      fs.mkdirSync('./uploads/death-certificates', { recursive: true });
+    }
+
+    const deathCertificateUrl = `/uploads/death-certificates/${file.filename}`;
+    const updated = await this.visitorService.updateBurialRequestDeathCert(id, deathCertificateUrl);
+    return { success: true, message: 'Death certificate uploaded successfully', data: updated };
   }
 
   @UseGuards(JwtAuthGuard)

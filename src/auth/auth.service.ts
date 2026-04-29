@@ -149,16 +149,45 @@ export class AuthService {
   async getProfile(id: string) {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+    return ApiResponse.success('Profile fetched', user);
   }
 
   async updateProfile(id: string, updateData: any) {
+    // Handle password update
     if (updateData.password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password_hash = await bcrypt.hash(updateData.password, salt);
       delete updateData.password;
     }
-    await this.userRepository.update(id, updateData);
-    return this.getProfile(id);
+
+    // Map email_address to email if present (from frontend)
+    if (updateData.email_address) {
+      updateData.email = updateData.email_address;
+      delete updateData.email_address;
+    }
+
+    // These fields should not be updated via general profile update
+    delete updateData.id;
+    delete updateData.uid;
+    delete updateData.role;
+
+    try {
+      await this.userRepository.update(id, updateData);
+      const updatedUser = await this.userRepository.findOne({
+        where: { id },
+        select: ['id', 'uid', 'username', 'email', 'role', 'first_name', 'last_name', 'address', 'phone'],
+      });
+      return ApiResponse.success('Profile updated successfully', updatedUser);
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        if (error.message.includes('email')) {
+          return ApiResponse.error('Email already in use', null, 'EMAIL_ALREADY_IN_USE');
+        }
+        if (error.message.includes('username')) {
+          return ApiResponse.error('Username already taken', null, 'USERNAME_ALREADY_TAKEN');
+        }
+      }
+      throw error;
+    }
   }
 }

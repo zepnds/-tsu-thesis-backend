@@ -48,7 +48,9 @@ export class VisitorService {
   }
 
   async reservePlot(userId: string, plotId: string, reservationData: any) {
-    const plot = await this.plotRepository.findOne({ where: { id: plotId } });
+    const plot = await this.plotRepository.createQueryBuilder('plot')
+      .where('plot.id = :plotId::bigint', { plotId })
+      .getOne();
 
     if (!plot) {
       throw new NotFoundException('Plot not found');
@@ -78,10 +80,10 @@ export class VisitorService {
   }
 
   async getMyReservations(userId: string) {
-    return this.reservationRepository.find({
-      where: { user_id: userId },
-      relations: ['plot'],
-    });
+    return this.reservationRepository.createQueryBuilder('reservation')
+      .leftJoinAndSelect('reservation.plot', 'plot')
+      .where('reservation.user_id = :userId::bigint', { userId })
+      .getMany();
   }
 
   async getAllGraves(options: { search?: string; limit?: number; offset?: number } = {}) {
@@ -111,13 +113,18 @@ export class VisitorService {
     if (requestData.reservation_id === '') requestData.reservation_id = null;
 
     if (requestData.plot_id) {
-      const brequest = await this.burialRequestRepository.findOne({ where: { plot_id: requestData.plot_id } });
-      const plotRequest = this.reservationRepository.findOne({ where: { plot_id: requestData.plot_id, user_id: userId } });
+      const brequest = await this.burialRequestRepository.createQueryBuilder('burial')
+        .where('burial.plot_id = :plotId::bigint', { plotId: requestData.plot_id })
+        .getOne();
+      const plotRequest = await this.reservationRepository.createQueryBuilder('reservation')
+        .where('reservation.plot_id = :plotId::bigint', { plotId: requestData.plot_id })
+        .andWhere('reservation.user_id = :userId::bigint', { userId })
+        .getOne();
       if (!plotRequest) {
-        throw new ConflictException('You have no reservation for this plot id');
+        return ApiResponse.error('You have no reservation for the selected plot id', 409);
       }
       if (brequest) {
-        throw new ConflictException('You have plot id pending burial requests');
+        return ApiResponse.error('You have pending burial requests for the selected plot id', 409);
       }
     }
 
@@ -135,21 +142,27 @@ export class VisitorService {
   }
 
   async getMyBurialRequests(userId: string) {
+    return this.burialRequestRepository.createQueryBuilder('burial')
+      .leftJoinAndSelect('burial.plot', 'plot')
+      .where('burial.family_contact = :userId::bigint', { userId })
+      .orderBy('burial.created_at', 'DESC')
+      .getMany();
+  }
 
-
-    return this.burialRequestRepository.find({
-      where: { family_contact: userId },
-      relations: ['plot'],
-      order: { created_at: 'DESC' },
-    });
+  async updateBurialRequestDeathCert(id: string, url: string) {
+    const request = await this.burialRequestRepository.findOne({ where: { id: id as any } });
+    if (!request) {
+      throw new NotFoundException('Burial request not found');
+    }
+    request.death_certificate_url = url;
+    return this.burialRequestRepository.save(request);
   }
 
   async getMyDeceasedFamily(userId: string) {
     try {
-
-      const results = await this.graveRepository.find(
-        { where: { userId } }
-      );
+      const results = await this.graveRepository.createQueryBuilder('grave')
+        .where('grave.user_id = :userId::bigint', { userId })
+        .getMany();
 
       return results;
     } catch (error) {
@@ -160,15 +173,18 @@ export class VisitorService {
 
   async getMyDeceasedFamilyPlot(userId: string, plotId: string) {
     if (plotId) {
-      const brequest = await this.graveRepository.findOne({ where: { plot_id: plotId } });
+      const brequest = await this.graveRepository.createQueryBuilder('grave')
+        .where('grave.plot_id = :plotId::bigint', { plotId })
+        .getOne();
       if (!brequest?.plot_id) {
         throw new ConflictException('Request plot id cannot be found');
       }
     }
-    return this.graveRepository.find({
-      where: { plot_id: plotId, userId },
-      order: { created_at: 'DESC' },
-    });
+    return this.graveRepository.createQueryBuilder('grave')
+      .where('grave.plot_id = :plotId::bigint', { plotId })
+      .andWhere('grave.user_id = :userId::bigint', { userId })
+      .orderBy('grave.created_at', 'DESC')
+      .getMany();
   }
 
   async createMaintenanceRequest(userId: string, requestData: any) {
@@ -199,10 +215,12 @@ export class VisitorService {
   }
 
   async getMyMaintenanceRequests(userId: string) {
-    return this.maintenanceRequestRepository.find({
-      where: { requester_id: userId },
-      relations: ['plot', 'grave', 'infrastructure'],
-      order: { created_at: 'DESC' },
-    });
+    return this.maintenanceRequestRepository.createQueryBuilder('maintenance')
+      .leftJoinAndSelect('maintenance.plot', 'plot')
+      .leftJoinAndSelect('maintenance.grave', 'grave')
+      .leftJoinAndSelect('maintenance.infrastructure', 'infrastructure')
+      .where('maintenance.requester_id = :userId::bigint', { userId })
+      .orderBy('maintenance.created_at', 'DESC')
+      .getMany();
   }
 }
