@@ -42,6 +42,9 @@ export class AdminService {
       console.log('--- Running manual migration: ALTER TABLE graves ADD COLUMN IF NOT EXISTS burial_time text ---');
       await this.dataSource.query(`ALTER TABLE graves ADD COLUMN IF NOT EXISTS burial_time text;`);
 
+      console.log('--- Running manual migration: ALTER TABLE users ADD COLUMN IF NOT EXISTS is_delete boolean DEFAULT false ---');
+      await this.dataSource.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_delete boolean DEFAULT false;`);
+
       console.log('--- Migration successful ---');
     } catch (error) {
       console.warn('--- Migration skipped or failed:', error.message, '---');
@@ -52,8 +55,8 @@ export class AdminService {
     // --- counts ---
     const [totalDeceased, totalVisitors, pendingBurials, activeMaintenance, totalPlots, availablePlots] =
       await Promise.all([
-        this.graveRepository.count(),
-        this.userRepository.count({ where: { role: 'visitor' } }),
+        this.graveRepository.count({ where: { is_delete: false } }),
+        this.userRepository.count({ where: { role: 'visitor', is_delete: false } }),
         this.burialRequestRepository.count({ where: { status: 'pending' } }),
         this.maintenanceRequestRepository.count({ where: { status: 'pending' } }),
         this.plotRepository.count(),
@@ -216,18 +219,27 @@ export class AdminService {
   }
 
   async getVisitors() {
-    return this.userRepository.find({ where: { role: 'visitor' } });
+    return this.userRepository.find({ where: { role: 'visitor', is_delete: false } });
+  }
+
+  async deleteVisitor(id: string) {
+    const user = await this.userRepository.findOne({ where: { id, role: 'visitor' } });
+    if (!user) {
+      throw new NotFoundException('Visitor not found');
+    }
+    await this.userRepository.update(id, { is_delete: true, is_active: false });
+    return { success: true, message: 'Visitor soft-deleted successfully' };
   }
 
   async updateVisitor(id: string, visitorData: any) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ where: { id, is_delete: false } });
     if (!user) {
       throw new NotFoundException('Visitor not found');
     }
 
     // Sanitize or filter fields if necessary, but here we can update directly
     await this.userRepository.update(id, visitorData);
-    return this.userRepository.findOne({ where: { id } });
+    return this.userRepository.findOne({ where: { id, is_delete: false } });
   }
 
   async getPlots() {

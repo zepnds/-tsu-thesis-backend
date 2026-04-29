@@ -90,6 +90,11 @@ export class AdminController {
     return this.adminService.updateVisitor(id, body);
   }
 
+  @Delete('visitors/:id')
+  async deleteVisitor(@Param('id') id: string) {
+    return this.adminService.deleteVisitor(id);
+  }
+
   @Get('reservations')
   async getReservations() {
     return this.adminService.getReservations();

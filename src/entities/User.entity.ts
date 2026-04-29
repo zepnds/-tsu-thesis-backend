@@ -38,6 +38,9 @@ export class User {
   @Column({ type: 'boolean', default: true, nullable: false })
   is_active: boolean;
 
+  @Column({ type: 'boolean', default: false, nullable: false })
+  is_delete: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
