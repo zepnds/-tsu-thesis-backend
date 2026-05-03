@@ -33,6 +33,7 @@ export class MaintenanceService {
   async schedule(id: string, updateData: any, schedulerId: string) {
     await this.maintenanceRepository.update(id, {
       ...updateData,
+      scheduled_by: schedulerId,
       status: 'scheduled',
       updated_at: new Date(),
     });
@@ -45,19 +46,23 @@ export class MaintenanceService {
     if (!saved) throw new NotFoundException('Maintenance request not found');
 
     // Send Email
-    if (saved.requester?.email) {
-      const dateStr = saved.scheduled_date ? new Date(saved.scheduled_date).toLocaleDateString() : 'TBD';
-      const timeStr = saved.scheduled_time || 'TBD';
-      await this.mailingService.sendEmail(
-        saved.requester.email,
-        'Maintenance Request Scheduled',
-        `<h1>Maintenance Scheduled</h1>
-         <p>Hello ${saved.requester.first_name},</p>
-         <p>Your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been scheduled.</p>
-         <p><strong>Date:</strong> ${dateStr}</p>
-         <p><strong>Time:</strong> ${timeStr}</p>
-         <p>Thank you.</p>`,
-      );
+    try {
+      if (saved.requester?.email) {
+        const dateStr = saved.scheduled_date ? new Date(saved.scheduled_date).toLocaleDateString() : 'TBD';
+        const timeStr = saved.scheduled_time || 'TBD';
+        await this.mailingService.sendEmail(
+          saved.requester.email,
+          'Maintenance Request Scheduled',
+          `<h1>Maintenance Scheduled</h1>
+           <p>Hello ${saved.requester.first_name},</p>
+           <p>Your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been scheduled.</p>
+           <p><strong>Date:</strong> ${dateStr}</p>
+           <p><strong>Time:</strong> ${timeStr}</p>
+           <p>Thank you.</p>`,
+        );
+      }
+    } catch (mailError) {
+      console.error('Failed to send maintenance schedule email:', mailError);
     }
 
     return saved;
@@ -78,16 +83,20 @@ export class MaintenanceService {
     if (!saved) throw new NotFoundException('Maintenance request not found');
 
     // Send Email
-    if (saved.requester?.email) {
-      await this.mailingService.sendEmail(
-        saved.requester.email,
-        'Maintenance Request Completed',
-        `<h1>Maintenance Completed</h1>
-         <p>Hello ${saved.requester.first_name},</p>
-         <p>Your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been marked as completed.</p>
-         ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
-         <p>Thank you.</p>`,
-      );
+    try {
+      if (saved.requester?.email) {
+        await this.mailingService.sendEmail(
+          saved.requester.email,
+          'Maintenance Request Completed',
+          `<h1>Maintenance Completed</h1>
+           <p>Hello ${saved.requester.first_name},</p>
+           <p>Your maintenance request for <strong>${saved.deceased_name || 'the plot'}</strong> has been marked as completed.</p>
+           ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
+           <p>Thank you.</p>`,
+        );
+      }
+    } catch (mailError) {
+      console.error('Failed to send maintenance completion email:', mailError);
     }
 
     return saved;
