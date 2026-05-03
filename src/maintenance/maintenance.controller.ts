@@ -1,7 +1,9 @@
-import { Controller, Get, Patch, Param, Body, Query, Req } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, Query, Req, UseGuards } from '@nestjs/common';
 import { MaintenanceService } from './maintenance.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('admin/maintenance')
+@UseGuards(JwtAuthGuard)
 export class MaintenanceController {
   constructor(private readonly service: MaintenanceService) {}
 
@@ -13,8 +15,8 @@ export class MaintenanceController {
 
   @Patch('/:id/schedule')
   async schedule(@Param('id') id: string, @Body() body: any, @Req() req: any) {
-    const schedulerId = req.user?.id || '15';
-    const data = await this.service.schedule(id, body, schedulerId);
+    const schedulerId = req.user?.id || 'admin';
+    const data = await this.service.schedule(id, body, String(schedulerId));
     return { ok: true, message: 'Scheduled', data };
   }
 

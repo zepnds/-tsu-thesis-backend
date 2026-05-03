@@ -80,6 +80,11 @@ export class AdminController {
     return this.adminService.getVisitors();
   }
 
+  @Get('users/staff')
+  async getStaffUsers() {
+    return this.adminService.getStaffMembers();
+  }
+
   @Get('visitors')
   async getVisitors() {
     return this.adminService.getVisitors();

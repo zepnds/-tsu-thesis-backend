@@ -45,6 +45,14 @@ export class AdminService {
       console.log('--- Running manual migration: ALTER TABLE users ADD COLUMN IF NOT EXISTS is_delete boolean DEFAULT false ---');
       await this.dataSource.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_delete boolean DEFAULT false;`);
 
+      // --- Maintenance Requests Columns ---
+      console.log('--- Running manual migration for maintenance_requests columns ---');
+      await this.dataSource.query(`ALTER TABLE maintenance_requests ADD COLUMN IF NOT EXISTS scheduled_date date;`);
+      await this.dataSource.query(`ALTER TABLE maintenance_requests ADD COLUMN IF NOT EXISTS scheduled_time text;`);
+      await this.dataSource.query(`ALTER TABLE maintenance_requests ADD COLUMN IF NOT EXISTS scheduled_by text;`);
+      await this.dataSource.query(`ALTER TABLE maintenance_requests ADD COLUMN IF NOT EXISTS assigned_staff_id bigint;`);
+      await this.dataSource.query(`ALTER TABLE maintenance_requests ADD COLUMN IF NOT EXISTS completion_notes text;`);
+
       console.log('--- Migration successful ---');
     } catch (error) {
       console.warn('--- Migration skipped or failed:', error.message, '---');
@@ -220,6 +228,15 @@ export class AdminService {
 
   async getVisitors() {
     return this.userRepository.find({ where: { role: 'visitor', is_delete: false } });
+  }
+
+  async getStaffMembers() {
+    return this.userRepository.find({
+      where: [
+        { role: 'admin', is_delete: false },
+        { role: 'staff', is_delete: false }
+      ]
+    });
   }
 
   async deleteVisitor(id: string) {
