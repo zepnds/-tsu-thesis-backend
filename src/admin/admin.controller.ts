@@ -90,6 +90,11 @@ export class AdminController {
     return this.adminService.getVisitors();
   }
 
+  @Post('visitors')
+  async addVisitor(@Body() body: any) {
+    return this.adminService.addVisitor(body);
+  }
+
   @Put('visitors/:id')
   async updateVisitor(@Param('id') id: string, @Body() body: any) {
     return this.adminService.updateVisitor(id, body);

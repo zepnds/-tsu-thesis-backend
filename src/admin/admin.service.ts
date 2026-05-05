@@ -1,4 +1,6 @@
-import { Injectable, InternalServerErrorException, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, OnModuleInit, BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Plot } from '../entities/Plot.entity';
@@ -257,6 +259,74 @@ export class AdminService {
     // Sanitize or filter fields if necessary, but here we can update directly
     await this.userRepository.update(id, visitorData);
     return this.userRepository.findOne({ where: { id, is_delete: false } });
+  }
+
+  async addVisitor(userData: any) {
+    const { username, email, phone, first_name, last_name, address, role, password_str } = userData;
+
+    // Check for duplicates
+    const existingUser = await this.userRepository.findOne({
+      where: [{ username }, { email }, { phone }],
+    });
+
+    if (existingUser) {
+      if (existingUser.username === username) throw new BadRequestException('Username already taken');
+      if (existingUser.email === email) throw new BadRequestException('Email already registered');
+      if (existingUser.phone === phone) throw new BadRequestException('Phone already registered');
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password_str, salt);
+
+    // Generate UID
+    const uid = crypto.randomBytes(2).toString('hex').toUpperCase();
+
+    const newUser = this.userRepository.create({
+      uid,
+      username,
+      email,
+      password_hash,
+      password_str, // Storing plain text as well per entity structure
+      first_name,
+      last_name,
+      phone,
+      address,
+      role: role || 'visitor',
+      is_active: true,
+    });
+
+    const savedUser = await this.userRepository.save(newUser);
+
+    if (savedUser && savedUser.email) {
+      const subject = 'Your Account has been Created';
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #2d3748;">Account Created</h2>
+          <p>Hello <strong>${savedUser.first_name} ${savedUser.last_name}</strong>,</p>
+          <p>Your account has been successfully created by the administrator.</p>
+          <p><strong>Login Details:</strong></p>
+          <ul>
+            <li><strong>Username:</strong> ${savedUser.username}</li>
+            <li><strong>Password:</strong> ${password_str}</li>
+            <li><strong>Role:</strong> ${savedUser.role}</li>
+          </ul>
+          <p>You can now log in to the system using these credentials.</p>
+          <p>Please change your password after logging in for security.</p>
+          <p>Thank you for using our service.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #718096;">This is an automated message, please do not reply.</p>
+        </div>
+      `;
+      try {
+        await this.mailingService.sendEmail(savedUser.email, subject, htmlContent);
+      } catch (error) {
+        console.error('Failed to send account creation email:', error);
+      }
+    }
+
+    const { password_hash: _, ...result } = savedUser as any;
+    return result;
   }
 
   async getPlots() {
